@@ -27,3 +27,18 @@ export async function criarContas(nome, saldoInicial) {
   })
   return resposta.json()
 }
+
+export async function getTransacoes(){
+  const resposta = await fetch(`${BASE_URL}/transacoes`)
+  return resposta.json()
+}
+
+export async function criarTransacao(dados) {
+  const resposta = await fetch(`${BASE_URL}/transacoes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados),
+  })
+  return resposta.json()
+}
+
