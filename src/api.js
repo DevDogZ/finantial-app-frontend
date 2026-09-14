@@ -13,3 +13,17 @@ export async function criarCategoria(nome) {
   })
   return resposta.json()
 }
+
+export async function getContas() {
+  const resposta = await fetch(`${BASE_URL}/contas`)
+  return resposta.json()
+}
+
+export async function criarContas(nome, saldoInicial) {
+  const resposta = await fetch(`${BASE_URL}/contas`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome, saldo_inicial: saldoInicial }),
+  })
+  return resposta.json()
+}
