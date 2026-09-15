@@ -42,3 +42,23 @@ export async function criarTransacao(dados) {
   return resposta.json()
 }
 
+
+export async function getOrcamentos(){
+  const resposta = await fetch(`${BASE_URL}/orcamentos`)
+  return resposta.json()
+}
+
+export async function criarOrcamento(dados){
+  const resposta = await fetch(`${BASE_URL}/orcamentos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+
+  if(!resposta.ok){
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
