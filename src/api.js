@@ -62,3 +62,66 @@ export async function criarOrcamento(dados){
 
   return resposta.json()
 }
+
+export async function getMetas() {
+  const resposta = await fetch(`${BASE_URL}/metas`)
+  return resposta.json()
+}
+
+export async function criarMeta(nome, valorAlvo) {
+  const resposta = await fetch(`${BASE_URL}/metas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify( {nome, valor_alvo: valorAlvo })
+  })
+  return resposta.json()
+}
+
+export async function contribuirMeta( metaId, valorAlvo) {
+  const resposta = await fetch(`${BASE_URL}/metas/${metaId}/contribuir`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify({ valor })
+  })
+
+  if(!resposta.ok) {
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function getContasFixas() {
+  const resposta = await fetch(`${BASE_URL}/contas-fixas`)
+  return resposta.json()
+}
+
+export async function criarContaFixa(dados) {
+  const resposta = await fetch(`${BASE_URL}/contas-fixas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify(dados)
+  })
+
+  if(!resposta.ok){
+    return erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function pagarContaFixa(contaFixaId){
+  const resposta = await fetch(`${BASE_URL}/contas-fixas/${contaFixaId}/pagar`, {
+    method: 'POST', 
+  })
+  return resposta.json()
+}
+
+export async function desativarContaFixa(contaFixaId) {
+  const resposta = await fetch(`${BASE_URL}/contas-fixas/${contaFixaId}`, {
+    method: 'DELETE',
+  })
+  return resposta.json()
+}
