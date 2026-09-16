@@ -6,7 +6,8 @@ import {
   getOrcamentos, criarOrcamento,
   getMetas, criarMeta, contribuirMeta,
   getContasFixas, criarContaFixa, 
-  pagarContaFixa, desativarContaFixa
+  pagarContaFixa, desativarContaFixa,
+  getDividas, criarDivida, pagarParcelaDivida,
 } from './api'
 import FormularioCategoria from './components/FormularioCategoria'
 import ListaCategorias from './components/ListaCategorias'
@@ -20,6 +21,8 @@ import FomularioMeta from './components/FormularioMeta'
 import ListaMetas from './components/ListaMetas'
 import FormularioContaFixa from './components/FormularioContaFixa'
 import ListaContasFixas from './components/ListaContasFixas'
+import FormularioDivida from './components/FormularioDivida'
+import ListaDividas from './components/ListaDividas'
 
 
 import './App.css'
@@ -32,6 +35,7 @@ function App() {
   const [orcamentos, setOrcamentos] = useState([])
   const [metas, setMetas] = useState([])
   const [contasFixas, setContasFixas] = useState([])
+  const [dividas, setDividas] = useState([])
 
   useEffect(() => {
     carregarCategorias()
@@ -40,8 +44,23 @@ function App() {
     carregarOrcamentos()
     carregarMetas()
     carregarContasFixas()
+    carregarDividas()
   }, [])
 
+  async function carregarDividas() {
+    setDividas(await getDividas())
+  }
+
+  async function handleCriarDivida(dados){
+    await criarDivida(dados)
+    carregarDividas()
+  }
+
+  async function handlePagarParcelaDivida(id){
+    await pagarParcelaDivida(id)
+    carregarDividas()
+    carregarTransacoes()
+  }
 
   async function carregarContasFixas(){
     setContasFixas(await getContasFixas())
@@ -141,12 +160,16 @@ function App() {
       <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} />
 
       <h2>Contas Fixas</h2>
-      <FormularioContaFIxa aoCriar={handleCriarContaFixa} contas={contas} categorias={categorias} />
+      <FormularioContaFixa aoCriar={handleCriarContaFixa} contas={contas} categorias={categorias} />
       <ListaContasFixas
         contasFixas={contasFixas}
         aoPagar={handlePagarContaFixa}
         aoDesativar={handleDesativarContaFixa}
       />
+
+      <h2>Dividas</h2>
+      <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias}/>
+      <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} />
     </div>
   )
 }

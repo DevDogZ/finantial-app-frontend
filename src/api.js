@@ -125,3 +125,36 @@ export async function desativarContaFixa(contaFixaId) {
   })
   return resposta.json()
 }
+
+export async function getDividas() {
+  const resposta = await fetch(`${BASE_URL}/dividas`)
+  return resposta.json()
+}
+
+export async function criarDivida(dados) {
+  const resposta = await fetch(`${BASE_URL}/dividas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify(dados)
+  })
+
+  if(!resposta.ok) {
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function pagarParcelaDivida(dividaId){
+  const resposta = await fetch(`${BASE_URL}/dividas/${dividaId}/pagar-parcela`, {
+    method: 'POST'
+  })
+
+  if(!resposta.ok){
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
