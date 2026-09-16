@@ -19,7 +19,7 @@ export async function getContas() {
   return resposta.json()
 }
 
-export async function criarContas(nome, saldoInicial) {
+export async function criarConta(nome, saldoInicial) {
   const resposta = await fetch(`${BASE_URL}/contas`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json' },

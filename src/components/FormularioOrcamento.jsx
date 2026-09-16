@@ -66,7 +66,7 @@ function FormularioOrcamento( {aoCriar, categorias}) {
                 placeholder="Valor limite"
             />
 
-            <buttom type="submit">Adicionar</buttom>
+            <button type="submit">Adicionar</button>
 
             {erro && <p style={{ color: 'red'}}>{erro}</p>}
         </form>

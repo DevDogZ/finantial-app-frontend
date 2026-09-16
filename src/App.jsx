@@ -16,9 +16,8 @@ import FormularioConta from './components/FormularioConta'
 import ListaContas from './components/ListaContas'
 import FormularioTransacao from './components/FormularioTransacao'
 import ListaTransacoes from './components/ListaTransacoes'
-import FormularioOrcamento from './components/ListaOrcamentos'
+import FormularioOrcamento from './components/FormularioOrcamento'
 import ListaOrcamentos from './components/ListaOrcamentos'
-import FomularioMeta from './components/FormularioMeta'
 import ListaMetas from './components/ListaMetas'
 import FormularioContaFixa from './components/FormularioContaFixa'
 import ListaContasFixas from './components/ListaContasFixas'
@@ -153,58 +152,63 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Financas da Casa</h1>
+  <div className="app">
+    <h1 className="app-titulo">Financas da Casa</h1>
 
+    <section className="card">
       <h2>Categorias</h2>
       <FormularioCategoria aoCriar={handleCriarCategoria} />
       <ListaCategorias categorias={categorias} />
+    </section>
 
+    <section className="card">
       <h2>Contas</h2>
       <FormularioConta aoCriar={handleCriarConta} />
       <ListaContas contas={contas} />
+    </section>
 
+    <section className="card">
       <h2>Transacoes</h2>
-      <FormularioTransacao
-        aoCriar={handleCriarTransacao}
-        contas={contas}
-        categorias={categorias}
-      />
+      <FormularioTransacao aoCriar={handleCriarTransacao} contas={contas} categorias={categorias} />
       <ListaTransacoes transacoes={transacoes} />
+    </section>
 
+    <section className="card">
       <h2>Orcamentos</h2>
       <FormularioOrcamento aoCriar={handleCriarOrcamento} categorias={categorias} />
       <ListaOrcamentos orcamentos={orcamentos} />
+    </section>
 
+    <section className="card">
       <h2>Metas</h2>
       <FormularioMeta aoCriar={handleCriarMeta} />
       <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} />
+    </section>
 
+    <section className="card">
       <h2>Contas Fixas</h2>
       <FormularioContaFixa aoCriar={handleCriarContaFixa} contas={contas} categorias={categorias} />
-      <ListaContasFixas
-        contasFixas={contasFixas}
-        aoPagar={handlePagarContaFixa}
-        aoDesativar={handleDesativarContaFixa}
-      />
+      <ListaContasFixas contasFixas={contasFixas} aoPagar={handlePagarContaFixa} aoDesativar={handleDesativarContaFixa} />
+    </section>
 
+    <section className="card">
       <h2>Dividas</h2>
-      <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias}/>
+      <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias} />
       <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} />
+    </section>
 
+    <section className="card">
       <h2>Cartoes de Credito</h2>
       <FormularioCartao aoCriar={handleCriarCartao} />
-
       <h3>Nova compra</h3>
-      <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias}/>
-
+      <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias} />
       <h3>Compras registradas</h3>
       <ListaComprasCartao compras={comprasCartao} />
-
       <h3>Consultar fatura</h3>
       <VisualizadorFatura cartoes={cartoes} />
-    </div>
-  )
+    </section>
+  </div>
+)
 }
 
 export default App

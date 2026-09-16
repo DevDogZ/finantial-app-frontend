@@ -1,4 +1,4 @@
-function ListaOrcamentos( {orcamentos}) {
+function ListaOrcamentos({ orcamentos }) {
     return (
         <ul>
             {orcamentos.map((orcamento) => (
