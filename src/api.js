@@ -192,3 +192,8 @@ export async function getFatura(cartaoId, mes, ano){
   const resposta = await fetch(`${BASE_URL}/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`)
   return resposta.json()
 }
+
+export async function getSaldoConta(contaId){
+  const resposta = await fetch(`${BASE_URL}/contas/${contaId}/saldo`)
+  return resposta.json()
+}
