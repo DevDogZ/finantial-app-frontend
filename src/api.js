@@ -158,3 +158,37 @@ export async function pagarParcelaDivida(dividaId){
 
   return resposta.json()
 }
+
+export async function getCartoes(){
+  const resposta = await fetch(`${BASE_URL}/cartoes`)
+  return resposta.json()
+}
+
+export async function criarCartao(dados){
+  const resposta = await fetch(`${BASE_URL}/cartoes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+  return resposta.json()
+}
+
+export async function criarCompraCartao(dados){
+  const resposta = await fetch(`${BASE_URL}/compras-cartao`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+
+  if(!resposta.ok){
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function getFatura(cartaoId, mes, ano){
+  const resposta = await fetch(`${BASE_URL}/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`)
+  return resposta.json()
+}

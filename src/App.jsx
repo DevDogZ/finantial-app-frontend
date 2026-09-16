@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useActionState } from 'react'
 import {
   getCategorias, criarCategoria,
   getContas, criarConta,
@@ -8,6 +8,7 @@ import {
   getContasFixas, criarContaFixa, 
   pagarContaFixa, desativarContaFixa,
   getDividas, criarDivida, pagarParcelaDivida,
+  getCartoes, criarCartao, criarCompraCartao,
 } from './api'
 import FormularioCategoria from './components/FormularioCategoria'
 import ListaCategorias from './components/ListaCategorias'
@@ -23,7 +24,10 @@ import FormularioContaFixa from './components/FormularioContaFixa'
 import ListaContasFixas from './components/ListaContasFixas'
 import FormularioDivida from './components/FormularioDivida'
 import ListaDividas from './components/ListaDividas'
-
+import FormularioCompraCartao from './components/FormularioCompraCartao'
+import ListaComprasCartao from './components/ListaComprasCartao'
+import VisualizadorFatura from './components/VisualizadorFatura'
+import FormularioCartao from './components/FormularioCartao'
 
 import './App.css'
 import FormularioMeta from './components/FormularioMeta'
@@ -36,6 +40,8 @@ function App() {
   const [metas, setMetas] = useState([])
   const [contasFixas, setContasFixas] = useState([])
   const [dividas, setDividas] = useState([])
+  const [cartoes, setCartoes] = useState([])
+  const [comprasCartao, setComprasCartao] = useState([])
 
   useEffect(() => {
     carregarCategorias()
@@ -45,7 +51,22 @@ function App() {
     carregarMetas()
     carregarContasFixas()
     carregarDividas()
+    carregarCartoes()
   }, [])
+
+  async function carregarCartoes(){
+    setCartoes(await getCartoes())
+  }
+
+  async function handleCriarCartao(dados){
+    await criarCartao(dados)
+    carregarCartoes()
+  }
+
+  async function handleCriarCompraCartao(dados) {
+    const novaCompra = await criarCompraCartao(dados)
+    setComprasCartao([...comprasCartao, novaCompra])
+  }
 
   async function carregarDividas() {
     setDividas(await getDividas())
@@ -170,6 +191,18 @@ function App() {
       <h2>Dividas</h2>
       <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias}/>
       <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} />
+
+      <h2>Cartoes de Credito</h2>
+      <FormularioCartao aoCriar={handleCriarCartao} />
+
+      <h3>Nova compra</h3>
+      <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias}/>
+
+      <h3>Compras registradas</h3>
+      <ListaComprasCartao compras={comprasCartao} />
+
+      <h3>Consultar fatura</h3>
+      <VisualizadorFatura cartoes={cartoes} />
     </div>
   )
 }
