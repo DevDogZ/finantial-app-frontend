@@ -77,7 +77,7 @@ export async function criarMeta(nome, valorAlvo) {
   return resposta.json()
 }
 
-export async function contribuirMeta( metaId, valorAlvo) {
+export async function contribuirMeta(metaId, valor) {
   const resposta = await fetch(`${BASE_URL}/metas/${metaId}/contribuir`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json'},
@@ -105,7 +105,7 @@ export async function criarContaFixa(dados) {
   })
 
   if(!resposta.ok){
-    return erro = await resposta.json()
+    const erro = await resposta.json()
     throw new Error(erro.detail)
   }
 
@@ -195,5 +195,72 @@ export async function getFatura(cartaoId, mes, ano){
 
 export async function getSaldoConta(contaId){
   const resposta = await fetch(`${BASE_URL}/contas/${contaId}/saldo`)
+  return resposta.json()
+}
+
+export async function deletarCategoria(categoriaId) {
+  const resposta = await fetch(`${BASE_URL}/categorias/${categoriaId}`, {
+    method: 'DELETE',
+  })
+
+  if (!resposta.ok) {
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function deletarConta(contaId) {
+  const resposta = await fetch(`${BASE_URL}/contas/${contaId}`, {
+    method: 'DELETE',
+  })
+
+  if (!resposta.ok) {
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
+  return resposta.json()
+}
+
+export async function deletarTransacao(transacaoId) {
+  const resposta = await fetch(`${BASE_URL}/transacoes/${transacaoId}`, {
+    method: 'DELETE',
+  })
+  return resposta.json()
+}
+
+export async function deletarOrcamento(orcamentoId) {
+  const resposta = await fetch(`${BASE_URL}/orcamentos/${orcamentoId}`, {
+    method: 'DELETE',
+  })
+  return resposta.json()
+}
+
+export async function deletarMeta(metaId) {
+  const resposta = await fetch(`${BASE_URL}/metas/${metaId}`, {
+    method: 'DELETE',
+  })
+  return resposta.json()
+}
+
+export async function deletarDivida(dividaId) {
+  const resposta = await fetch(`${BASE_URL}/dividas/${dividaId}`, {
+    method: 'DELETE',
+  })
+  return resposta.json()
+}
+
+export async function deletarCartao(cartaoId) {
+  const resposta = await fetch(`${BASE_URL}/cartoes/${cartaoId}`, {
+    method: 'DELETE',
+  })
+
+  if (!resposta.ok) {
+    const erro = await resposta.json()
+    throw new Error(erro.detail)
+  }
+
   return resposta.json()
 }

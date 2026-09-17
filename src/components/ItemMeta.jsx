@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function ItemMeta({ meta, aoContribuir }){
+function ItemMeta({ meta, aoContribuir, aoDeletar }){
     const [valorContribuicao, setValorContribuicao] = useState('')
 
     async function handleContribuir() {
@@ -25,6 +25,7 @@ function ItemMeta({ meta, aoContribuir }){
                     placeholder="Valor a contribuir"
                 />
                 <button onClick={handleContribuir}>Contribuir</button>
+                <button onClick={() => aoDeletar(meta.id)}>Apagar</button>
             </div>
         </li>
     )

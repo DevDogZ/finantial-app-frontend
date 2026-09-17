@@ -9,6 +9,8 @@ import {
   pagarContaFixa, desativarContaFixa,
   getDividas, criarDivida, pagarParcelaDivida,
   getCartoes, criarCartao, criarCompraCartao,
+  deletarCategoria, deletarConta, deletarTransacao,
+  deletarOrcamento, deletarMeta, deletarDivida, deletarCartao,
 } from './api'
 import FormularioCategoria from './components/FormularioCategoria'
 import ListaCategorias from './components/ListaCategorias'
@@ -27,6 +29,7 @@ import FormularioCompraCartao from './components/FormularioCompraCartao'
 import ListaComprasCartao from './components/ListaComprasCartao'
 import VisualizadorFatura from './components/VisualizadorFatura'
 import FormularioCartao from './components/FormularioCartao'
+import ListaCartoes from './components/ListaCartoes'
 
 import './App.css'
 import FormularioMeta from './components/FormularioMeta'
@@ -65,6 +68,53 @@ function App() {
   async function handleCriarCompraCartao(dados) {
     const novaCompra = await criarCompraCartao(dados)
     setComprasCartao([...comprasCartao, novaCompra])
+  }
+
+  async function handleDeletarCategoria(id) {
+    try {
+      await deletarCategoria(id)
+      carregarCategorias()
+    } catch (e) {
+      alert(e.message)
+    }
+  }
+
+  async function handleDeletarConta(id) {
+    try {
+      await deletarConta(id)
+      carregarContas()
+    } catch (e) {
+      alert(e.message)
+    }
+  }
+
+  async function handleDeletarTransacao(id) {
+    await deletarTransacao(id)
+    carregarTransacoes()
+  }
+
+  async function handleDeletarOrcamento(id) {
+    await deletarOrcamento(id)
+    carregarOrcamentos()
+  }
+
+  async function handleDeletarMeta(id) {
+    await deletarMeta(id)
+    carregarMetas()
+  }
+
+  async function handleDeletarDivida(id) {
+    await deletarDivida(id)
+    carregarDividas()
+  }
+
+  async function handleDeletarCartao(id) {
+    try {
+      await deletarCartao(id)
+      carregarCartoes()
+    } catch (e) {
+      alert(e.message)
+    }
   }
 
   async function carregarDividas() {
@@ -158,31 +208,31 @@ function App() {
     <section className="card">
       <h2>Categorias</h2>
       <FormularioCategoria aoCriar={handleCriarCategoria} />
-      <ListaCategorias categorias={categorias} />
+      <ListaCategorias categorias={categorias} aoDeletar={handleDeletarCategoria} />
     </section>
 
     <section className="card">
       <h2>Contas</h2>
       <FormularioConta aoCriar={handleCriarConta} />
-      <ListaContas contas={contas} />
+      <ListaContas contas={contas} aoDeletar={handleDeletarConta} />
     </section>
 
     <section className="card">
       <h2>Transacoes</h2>
       <FormularioTransacao aoCriar={handleCriarTransacao} contas={contas} categorias={categorias} />
-      <ListaTransacoes transacoes={transacoes} />
+      <ListaTransacoes transacoes={transacoes} aoDeletar={handleDeletarTransacao} />
     </section>
 
     <section className="card">
       <h2>Orcamentos</h2>
       <FormularioOrcamento aoCriar={handleCriarOrcamento} categorias={categorias} />
-      <ListaOrcamentos orcamentos={orcamentos} />
+      <ListaOrcamentos orcamentos={orcamentos} aoDeletar={handleDeletarOrcamento} />
     </section>
 
     <section className="card">
       <h2>Metas</h2>
       <FormularioMeta aoCriar={handleCriarMeta} />
-      <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} />
+      <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} aoDeletar={handleDeletarMeta} />
     </section>
 
     <section className="card">
@@ -194,12 +244,13 @@ function App() {
     <section className="card">
       <h2>Dividas</h2>
       <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias} />
-      <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} />
+      <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} aoDeletar={handleDeletarDivida} />
     </section>
 
     <section className="card">
       <h2>Cartoes de Credito</h2>
       <FormularioCartao aoCriar={handleCriarCartao} />
+      <ListaCartoes cartoes={cartoes} aoDeletar={handleDeletarCartao} />
       <h3>Nova compra</h3>
       <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias} />
       <h3>Compras registradas</h3>

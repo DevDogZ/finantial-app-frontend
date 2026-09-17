@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getSaldoConta } from "../api";
 
-function ItemConta({ conta }){
+function ItemConta({ conta, aoDeletar }){
     const [saldo, setSaldo] = useState(null)
 
     useEffect(() => {
@@ -11,6 +11,7 @@ function ItemConta({ conta }){
     return (
         <li>
             {conta.nome} - saldo atual: {saldo === null ? 'carregando...': `R$ ${saldo}`}
+            <button onClick={() => aoDeletar(conta.id)}>Apagar</button>
         </li>
     )
 }

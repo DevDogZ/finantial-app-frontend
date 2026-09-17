@@ -1,4 +1,4 @@
-function ItemDivida({ divida, aoPagarParcela }){
+function ItemDivida({ divida, aoPagarParcela, aoDeletar }){
     return (
         <li>
             {divida.nome} - {divida.parcelas_pagas}/{divida.numero_parcelas} parcelas - 
@@ -8,6 +8,7 @@ function ItemDivida({ divida, aoPagarParcela }){
             ) : (
                 <button onClick={() => aoPagarParcela(divida.id)}>Pagar parcela</button>
             )}
+            <button onClick={() => aoDeletar(divida.id)}>Apagar</button>
         </li>
     )
 }
