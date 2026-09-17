@@ -3,22 +3,16 @@ import ItemConta from './ItemConta'
 function ListaContas({ contas, aoDeletar }) {
   if (contas.length === 0) {
     return (
-      <div className="estado-vazio">
-        <div className="estado-vazio-icone">
-          $
-        </div>
-
+      <div className="estado-vazio estado-vazio-lista">
+        <span>▣</span>
         <strong>Nenhuma conta cadastrada</strong>
-
-        <p>
-          Adicione sua primeira conta para começar a acompanhar seus saldos.
-        </p>
+        <p>Crie sua primeira conta para começar.</p>
       </div>
     )
   }
 
   return (
-    <div className="lista-registros">
+    <ul className="lista-registros">
       {contas.map((conta) => (
         <ItemConta
           key={conta.id}
@@ -26,7 +20,7 @@ function ListaContas({ contas, aoDeletar }) {
           aoDeletar={aoDeletar}
         />
       ))}
-    </div>
+    </ul>
   )
 }
 

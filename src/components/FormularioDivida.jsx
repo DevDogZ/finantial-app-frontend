@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioDivida({ aoCriar, contas, categorias }) {
+function FormularioDivida({ aoCriar, contas, categorias, aoCancelar }) {
   const [nome, setNome] = useState('')
   const [valorParcela, setValorParcela] = useState('')
   const [numeroParcelas, setNumeroParcelas] = useState('')
@@ -114,9 +114,14 @@ function FormularioDivida({ aoCriar, contas, categorias }) {
         </div>
       )}
 
-      <button className="botao-principal" type="submit">
-        Adicionar dívida
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Adicionar dívida
+        </button>
+      </div>
     </form>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioCartao({ aoCriar }) {
+function FormularioCartao({ aoCriar, aoCancelar }) {
   const [nome, setNome] = useState('')
   const [limite, setLimite] = useState('')
   const [diaFechamento, setDiaFechamento] = useState('')
@@ -66,9 +66,14 @@ function FormularioCartao({ aoCriar }) {
         </div>
       </div>
 
-      <button className="botao-principal" type="submit">
-        Adicionar cartão
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Adicionar cartão
+        </button>
+      </div>
     </form>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioContaFixa({ aoCriar, contas, categorias }) {
+function FormularioContaFixa({ aoCriar, contas, categorias, aoCancelar }) {
   const [nome, setNome] = useState('')
   const [valor, setValor] = useState('')
   const [diaVencimento, setDiaVencimento] = useState('')
@@ -115,9 +115,14 @@ function FormularioContaFixa({ aoCriar, contas, categorias }) {
         </div>
       )}
 
-      <button className="botao-principal" type="submit">
-        Adicionar conta fixa
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Adicionar conta fixa
+        </button>
+      </div>
     </form>
   )
 }

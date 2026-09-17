@@ -29,7 +29,7 @@ function FormularioLogin({ aoEntrar, aoIrParaCadastro }) {
 
       <div className="auth-heading">
         <span className="auth-kicker">FINANÇAS PESSOAIS</span>
-        <h1>Finanças da Casa</h1>
+        <h1>FinanDog</h1>
         <p>Entre para acompanhar sua vida financeira.</p>
       </div>
 
@@ -51,19 +51,16 @@ function FormularioLogin({ aoEntrar, aoIrParaCadastro }) {
           <label htmlFor="login-senha">Senha</label>
           <div className="campo-senha">
             <input
-              id="login-senha"
               type={mostrarSenha ? 'text' : 'password'}
+              placeholder="Digite sua senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              placeholder="Digite sua senha"
-              autoComplete="current-password"
-              required
             />
+
             <button
               type="button"
               className="botao-mostrar-senha"
-              onClick={() => setMostrarSenha((valor) => !valor)}
-              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+              onClick={() => setMostrarSenha(!mostrarSenha)}
             >
               {mostrarSenha ? 'Ocultar' : 'Mostrar'}
             </button>

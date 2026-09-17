@@ -1,0 +1,20 @@
+FinanDog — atualização de interface
+
+Alterações incluídas:
+- Transações: página dedicada + modal para nova transação.
+- Orçamentos: página dedicada + modal para novo orçamento.
+- Metas: página dedicada + modal para nova meta.
+- Contas Fixas: página dedicada + modal para nova conta fixa.
+- Dívidas: página dedicada + modal para nova dívida.
+- Cartões: página dedicada + modal para novo cartão.
+- Compras de cartão: botão + modal para nova compra.
+- Todos os modais fecham pelo X, Cancelar, clique fora ou Esc.
+- Após salvar com sucesso, o modal fecha e a lista é atualizada.
+- Formulários agora possuem ações Cancelar/Criar quando usados em modal.
+- Marca atualizada para FinanDog no frontend.
+- Título da aba atualizado para FinanDog.
+
+Importante:
+Este pacote não inclui node_modules nem o diretório .git.
+Para aplicar no projeto existente, copie o conteúdo de src/ e index.html
+sobre seu frontend atual, preservando .git, node_modules e .env.

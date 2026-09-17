@@ -1,45 +1,52 @@
-function ItemConta({ conta, aoDeletar }) {
-  const saldo = Number(conta.saldo_atual ?? conta.saldo_inicial ?? 0)
+import { useEffect, useState } from 'react'
+import { getSaldoConta } from '../api'
 
-  function formatarMoeda(valor) {
-    return Number(valor || 0).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    })
-  }
+function ItemConta({ conta, aoDeletar }) {
+  const [saldo, setSaldo] = useState(null)
+
+  useEffect(() => {
+    let ativo = true
+
+    getSaldoConta(conta.id)
+      .then((dados) => {
+        if (ativo) setSaldo(dados.saldo_atual)
+      })
+      .catch(() => {
+        if (ativo) setSaldo(null)
+      })
+
+    return () => {
+      ativo = false
+    }
+  }, [conta.id])
 
   return (
-    <div className="registro-card">
-
-      <div className="registro-icone registro-icone-conta">
-        $
-      </div>
+    <li className="registro-card registro-conta">
+      <div className="registro-icone registro-icone-conta">$</div>
 
       <div className="registro-conteudo">
-        <strong>{conta.nome}</strong>
-
-        <span className="registro-descricao">
-          Saldo atual
-        </span>
+        <span className="registro-label">CONTA</span>
+        <strong className="registro-titulo">{conta.nome}</strong>
+        <span className="registro-subtitulo">Saldo atual</span>
       </div>
 
       <div className="registro-valor">
-        {formatarMoeda(saldo)}
+        <strong>
+          {saldo === null ? 'Carregando...' : `R$ ${Number(saldo).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`}
+        </strong>
       </div>
 
-      <div className="registro-acoes">
-        <button
-          type="button"
-          className="botao-excluir"
-          onClick={() => aoDeletar(conta.id)}
-          title="Excluir conta"
-        >
-          <span>×</span>
-          Excluir
-        </button>
-      </div>
-
-    </div>
+      <button
+        type="button"
+        className="botao-perigo"
+        onClick={() => aoDeletar(conta.id)}
+      >
+        Excluir
+      </button>
+    </li>
   )
 }
 

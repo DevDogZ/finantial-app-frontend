@@ -62,8 +62,8 @@ function Sidebar({
         </div>
 
         <div>
-          <strong>𝓕𝓘𝓝𝓐𝓝𝓓𝓞𝓖</strong>
-          <span>𝓕𝓘𝓝𝓐𝓝𝓒𝓔</span>
+          <strong>FINANDOG</strong>
+          <span>FINANCE</span>
         </div>
 
       </div>

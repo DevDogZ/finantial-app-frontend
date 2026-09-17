@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
-function FormularioMeta({ aoCriar }) {
+function FormularioMeta({ aoCriar, aoCancelar }) {
   const [nome, setNome] = useState('')
   const [valorAlvo, setValorAlvo] = useState('')
 
-  function handleSubmit(evento) {
+  async function handleSubmit(evento) {
     evento.preventDefault()
     if (!nome.trim() || valorAlvo === '') return
 
-    aoCriar(nome.trim(), parseFloat(valorAlvo))
+    await aoCriar(nome.trim(), parseFloat(valorAlvo))
     setNome('')
     setValorAlvo('')
   }
@@ -46,9 +46,14 @@ function FormularioMeta({ aoCriar }) {
         </div>
       </div>
 
-      <button className="botao-principal" type="submit">
-        Criar meta
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Criar meta
+        </button>
+      </div>
     </form>
   )
 }

@@ -20,7 +20,7 @@ function ListaCartoes({ cartoes, aoDeletar }) {
         <li key={cartao.id} className="registro-card registro-cartao">
           <div className="cartao-visual">
             <span className="cartao-chip" />
-            <span>FINANÇAS</span>
+            <span>FINANDOG</span>
           </div>
 
           <div className="registro-conteudo">

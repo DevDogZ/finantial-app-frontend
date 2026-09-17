@@ -68,6 +68,7 @@ import FormularioLogin from './components/FormularioLogin'
 import FormularioCadastro from './components/FormularioCadastro'
 
 import Layout from './components/Layout'
+import ModalFormulario from './components/ModalFormulario'
 
 import './App.css'
 
@@ -88,8 +89,7 @@ function App() {
   const [dividas, setDividas] = useState([])
   const [cartoes, setCartoes] = useState([])
   const [comprasCartao, setComprasCartao] = useState([])
-
-  const [mostrarModalTransacao, setMostrarModalTransacao] = useState(false)
+  const [modalAtual, setModalAtual] = useState(null)
 
 
   // ============================================================
@@ -119,7 +119,7 @@ function App() {
     setUsuario(null)
     setAutenticado(false)
     setPaginaAtual('dashboard')
-    setMostrarModalTransacao(false)
+    setModalAtual(null)
   }
 
 
@@ -235,7 +235,7 @@ function App() {
   async function handleCriarTransacao(dados) {
     await criarTransacao(dados)
     await carregarTransacoes()
-    setMostrarModalTransacao(false)
+    fecharModal()
   }
 
 
@@ -249,31 +249,31 @@ function App() {
   }
 
 
-  function abrirModalTransacao() {
-    setMostrarModalTransacao(true)
+  function abrirModal(tipo) {
+    setModalAtual(tipo)
   }
 
 
-  function fecharModalTransacao() {
-    setMostrarModalTransacao(false)
+  function fecharModal() {
+    setModalAtual(null)
   }
 
 
   useEffect(() => {
     function handleTeclaEscape(evento) {
       if (evento.key === 'Escape') {
-        setMostrarModalTransacao(false)
+        fecharModal()
       }
     }
 
-    if (mostrarModalTransacao) {
+    if (modalAtual) {
       document.addEventListener('keydown', handleTeclaEscape)
     }
 
     return () => {
       document.removeEventListener('keydown', handleTeclaEscape)
     }
-  }, [mostrarModalTransacao])
+  }, [modalAtual])
 
 
   // ============================================================
@@ -499,20 +499,20 @@ function App() {
   function renderPagina() {
     switch (paginaAtual) {
 
-      // ========================================================
-      // DASHBOARD
-      // ========================================================
-
       case 'dashboard':
         return (
           <div className="pagina">
 
             <div className="pagina-cabecalho">
               <div>
-                  <h1>Dashboard</h1>
+                <span className="pagina-kicker">
+                  VISÃO GERAL
+                </span>
+
+                <h1>Dashboard</h1>
+
                 <p>
-                  Bem-vindo ao FinanDog
-                  Seu dinheiro, organizado do seu jeito..
+                  Bem-vindo ao FinanDog. Seu dinheiro, organizado do seu jeito.
                 </p>
               </div>
             </div>
@@ -647,10 +647,6 @@ function App() {
             </div>
 
 
-            {/* ==================================================
-                TRANSAÇÕES RECENTES
-            ================================================== */}
-
             <div className="painel painel-transacoes">
 
               <div className="painel-cabecalho">
@@ -663,7 +659,6 @@ function App() {
                 </div>
 
                 <button
-                  type="button"
                   className="botao-secundario"
                   onClick={() => setPaginaAtual('transacoes')}
                 >
@@ -682,8 +677,8 @@ function App() {
 
                   <button
                     type="button"
-                    className="botao-principal"
-                    onClick={abrirModalTransacao}
+                    className="botao-principal botao-vazio-acao"
+                    onClick={() => abrirModal('transacao')}
                   >
                     + Nova transação
                   </button>
@@ -705,20 +700,11 @@ function App() {
                           </strong>
 
                           <small>
-                            {transacao.tipo === 'entrada'
-                              ? 'Entrada'
-                              : 'Saída'}
+                            {transacao.tipo}
                           </small>
                         </div>
 
-                        <strong
-                          className={
-                            transacao.tipo === 'entrada'
-                              ? 'texto-entrada'
-                              : 'texto-saida'
-                          }
-                        >
-                          {transacao.tipo === 'entrada' ? '+' : '-'}{' '}
+                        <strong>
                           {formatarMoeda(transacao.valor)}
                         </strong>
                       </div>
@@ -732,10 +718,6 @@ function App() {
           </div>
         )
 
-
-      // ========================================================
-      // CATEGORIAS
-      // ========================================================
 
       case 'categorias':
         return (
@@ -792,10 +774,6 @@ function App() {
         )
 
 
-      // ========================================================
-      // CONTAS
-      // ========================================================
-
       case 'contas':
         return (
           <div className="pagina">
@@ -845,14 +823,9 @@ function App() {
         )
 
 
-      // ========================================================
-      // TRANSAÇÕES
-      // ========================================================
-
       case 'transacoes':
         return (
           <div className="pagina">
-
             <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
@@ -862,23 +835,21 @@ function App() {
                 <h1>Transações</h1>
 
                 <p>
-                  Consulte e gerencie todas as suas movimentações.
+                  Registre e acompanhe suas movimentações.
                 </p>
               </div>
 
               <button
                 type="button"
-                className="botao-principal botao-nova-transacao"
-                onClick={abrirModalTransacao}
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('transacao')}
               >
                 <span>+</span>
                 Nova transação
               </button>
             </div>
 
-
             <div className="painel painel-historico">
-
               <div className="painel-cabecalho">
                 <div>
                   <span className="painel-kicker">
@@ -897,22 +868,15 @@ function App() {
                 transacoes={transacoes}
                 aoDeletar={handleDeletarTransacao}
               />
-
             </div>
-
           </div>
         )
 
 
-      // ========================================================
-      // ORÇAMENTOS
-      // ========================================================
-
       case 'orcamentos':
         return (
           <div className="pagina">
-
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   PLANEJAMENTO
@@ -924,37 +888,45 @@ function App() {
                   Controle quanto pretende gastar em cada categoria.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('orcamento')}
+              >
+                <span>+</span>
+                Novo orçamento
+              </button>
             </div>
 
-            <div className="painel">
-              <h2>Novo orçamento</h2>
+            <div className="painel painel-historico">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    PLANEJAMENTO
+                  </span>
 
-              <FormularioOrcamento
-                aoCriar={handleCriarOrcamento}
-                categorias={categorias}
-              />
-            </div>
+                  <h2>Seus orçamentos</h2>
+                </div>
 
-            <div className="painel">
+                <span className="painel-contador">
+                  {orcamentos.length}
+                </span>
+              </div>
+
               <ListaOrcamentos
                 orcamentos={orcamentos}
                 aoDeletar={handleDeletarOrcamento}
               />
             </div>
-
           </div>
         )
 
 
-      // ========================================================
-      // METAS
-      // ========================================================
-
       case 'metas':
         return (
           <div className="pagina">
-
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   PLANEJAMENTO
@@ -966,37 +938,46 @@ function App() {
                   Acompanhe seus objetivos financeiros.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('meta')}
+              >
+                <span>+</span>
+                Nova meta
+              </button>
             </div>
 
-            <div className="painel">
-              <h2>Nova meta</h2>
+            <div className="painel painel-historico">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    OBJETIVOS
+                  </span>
 
-              <FormularioMeta
-                aoCriar={handleCriarMeta}
-              />
-            </div>
+                  <h2>Suas metas</h2>
+                </div>
 
-            <div className="painel">
+                <span className="painel-contador">
+                  {metas.length}
+                </span>
+              </div>
+
               <ListaMetas
                 metas={metas}
                 aoContribuir={handleContribuirMeta}
                 aoDeletar={handleDeletarMeta}
               />
             </div>
-
           </div>
         )
 
 
-      // ========================================================
-      // CONTAS FIXAS
-      // ========================================================
-
       case 'contas-fixas':
         return (
           <div className="pagina">
-
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   RECORRÊNCIAS
@@ -1008,39 +989,46 @@ function App() {
                   Acompanhe suas despesas recorrentes.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('conta-fixa')}
+              >
+                <span>+</span>
+                Nova conta fixa
+              </button>
             </div>
 
-            <div className="painel">
-              <h2>Nova conta fixa</h2>
+            <div className="painel painel-historico">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    RECORRÊNCIAS
+                  </span>
 
-              <FormularioContaFixa
-                aoCriar={handleCriarContaFixa}
-                contas={contas}
-                categorias={categorias}
-              />
-            </div>
+                  <h2>Suas contas fixas</h2>
+                </div>
 
-            <div className="painel">
+                <span className="painel-contador">
+                  {contasFixas.length}
+                </span>
+              </div>
+
               <ListaContasFixas
                 contasFixas={contasFixas}
                 aoPagar={handlePagarContaFixa}
                 aoDesativar={handleDesativarContaFixa}
               />
             </div>
-
           </div>
         )
 
 
-      // ========================================================
-      // DÍVIDAS
-      // ========================================================
-
       case 'dividas':
         return (
           <div className="pagina">
-
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   COMPROMISSOS
@@ -1052,39 +1040,46 @@ function App() {
                   Controle parcelas e compromissos financeiros.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('divida')}
+              >
+                <span>+</span>
+                Nova dívida
+              </button>
             </div>
 
-            <div className="painel">
-              <h2>Nova dívida</h2>
+            <div className="painel painel-historico">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    COMPROMISSOS
+                  </span>
 
-              <FormularioDivida
-                aoCriar={handleCriarDivida}
-                contas={contas}
-                categorias={categorias}
-              />
-            </div>
+                  <h2>Suas dívidas</h2>
+                </div>
 
-            <div className="painel">
+                <span className="painel-contador">
+                  {dividas.length}
+                </span>
+              </div>
+
               <ListaDividas
                 dividas={dividas}
                 aoPagarParcela={handlePagarParcelaDivida}
                 aoDeletar={handleDeletarDivida}
               />
             </div>
-
           </div>
         )
 
 
-      // ========================================================
-      // CARTÕES
-      // ========================================================
-
       case 'cartoes':
         return (
           <div className="pagina">
-
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   CRÉDITO
@@ -1093,17 +1088,34 @@ function App() {
                 <h1>Cartões</h1>
 
                 <p>
-                  Gerencie seus cartões e compras.
+                  Gerencie seus cartões e acompanhe suas compras.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('cartao')}
+              >
+                <span>+</span>
+                Novo cartão
+              </button>
             </div>
 
-            <div className="painel">
-              <h2>Novo cartão</h2>
+            <div className="painel painel-historico">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    SEUS CARTÕES
+                  </span>
 
-              <FormularioCartao
-                aoCriar={handleCriarCartao}
-              />
+                  <h2>Cartões cadastrados</h2>
+                </div>
+
+                <span className="painel-contador">
+                  {cartoes.length}
+                </span>
+              </div>
 
               <ListaCartoes
                 cartoes={cartoes}
@@ -1112,17 +1124,23 @@ function App() {
             </div>
 
             <div className="painel">
-              <h2>Nova compra</h2>
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    MOVIMENTAÇÃO
+                  </span>
 
-              <FormularioCompraCartao
-                aoCriar={handleCriarCompraCartao}
-                cartoes={cartoes}
-                categorias={categorias}
-              />
-            </div>
+                  <h2>Compras</h2>
+                </div>
 
-            <div className="painel">
-              <h2>Compras registradas</h2>
+                <button
+                  type="button"
+                  className="botao-secundario"
+                  onClick={() => abrirModal('compra-cartao')}
+                >
+                  + Nova compra
+                </button>
+              </div>
 
               <ListaComprasCartao
                 compras={comprasCartao}
@@ -1130,13 +1148,20 @@ function App() {
             </div>
 
             <div className="painel">
-              <h2>Consultar fatura</h2>
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    CONSULTA
+                  </span>
+
+                  <h2>Fatura</h2>
+                </div>
+              </div>
 
               <VisualizadorFatura
                 cartoes={cartoes}
               />
             </div>
-
           </div>
         )
 
@@ -1195,68 +1220,130 @@ function App() {
         {renderPagina()}
       </Layout>
 
+      <ModalFormulario
+        aberto={modalAtual === 'transacao'}
+        kicker="MOVIMENTAÇÃO"
+        titulo="Nova transação"
+        descricao="Registre uma nova entrada ou saída."
+        tituloId="modal-transacao-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioTransacao
+          aoCriar={handleCriarTransacao}
+          aoCancelar={fecharModal}
+          contas={contas}
+          categorias={categorias}
+        />
+      </ModalFormulario>
 
-      {/* ========================================================
-          MODAL — NOVA TRANSAÇÃO
-      ======================================================== */}
-
-      {mostrarModalTransacao && (
-        <div
-          className="modal-overlay"
-          onMouseDown={(evento) => {
-            if (evento.target === evento.currentTarget) {
-              fecharModalTransacao()
-            }
+      <ModalFormulario
+        aberto={modalAtual === 'orcamento'}
+        kicker="PLANEJAMENTO"
+        titulo="Novo orçamento"
+        descricao="Defina um limite para seus gastos."
+        tituloId="modal-orcamento-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioOrcamento
+          aoCriar={async (dados) => {
+            await handleCriarOrcamento(dados)
+            fecharModal()
           }}
-        >
-          <div
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-transacao-titulo"
-          >
+          aoCancelar={fecharModal}
+          categorias={categorias}
+        />
+      </ModalFormulario>
 
-            <div className="modal-cabecalho">
+      <ModalFormulario
+        aberto={modalAtual === 'meta'}
+        kicker="OBJETIVO"
+        titulo="Nova meta"
+        descricao="Crie um novo objetivo financeiro."
+        tituloId="modal-meta-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioMeta
+          aoCriar={async (nome, valor) => {
+            await handleCriarMeta(nome, valor)
+            fecharModal()
+          }}
+          aoCancelar={fecharModal}
+        />
+      </ModalFormulario>
 
-              <div>
-                <span className="modal-kicker">
-                  MOVIMENTAÇÃO
-                </span>
+      <ModalFormulario
+        aberto={modalAtual === 'conta-fixa'}
+        kicker="RECORRÊNCIA"
+        titulo="Nova conta fixa"
+        descricao="Cadastre uma nova despesa recorrente."
+        tituloId="modal-conta-fixa-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioContaFixa
+          aoCriar={async (dados) => {
+            await handleCriarContaFixa(dados)
+            fecharModal()
+          }}
+          aoCancelar={fecharModal}
+          contas={contas}
+          categorias={categorias}
+        />
+      </ModalFormulario>
 
-                <h2 id="modal-transacao-titulo">
-                  Nova transação
-                </h2>
+      <ModalFormulario
+        aberto={modalAtual === 'divida'}
+        kicker="COMPROMISSO"
+        titulo="Nova dívida"
+        descricao="Cadastre uma nova dívida parcelada."
+        tituloId="modal-divida-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioDivida
+          aoCriar={async (dados) => {
+            await handleCriarDivida(dados)
+            fecharModal()
+          }}
+          aoCancelar={fecharModal}
+          contas={contas}
+          categorias={categorias}
+        />
+      </ModalFormulario>
 
-                <p>
-                  Registre uma nova entrada ou saída.
-                </p>
-              </div>
+      <ModalFormulario
+        aberto={modalAtual === 'cartao'}
+        kicker="CRÉDITO"
+        titulo="Novo cartão"
+        descricao="Cadastre um novo cartão de crédito."
+        tituloId="modal-cartao-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioCartao
+          aoCriar={async (dados) => {
+            await handleCriarCartao(dados)
+            fecharModal()
+          }}
+          aoCancelar={fecharModal}
+        />
+      </ModalFormulario>
 
-              <button
-                type="button"
-                className="modal-fechar"
-                onClick={fecharModalTransacao}
-                aria-label="Fechar"
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            <div className="modal-conteudo">
-
-              <FormularioTransacao
-                aoCriar={handleCriarTransacao}
-                contas={contas}
-                categorias={categorias}
-              />
-
-            </div>
-
-          </div>
-        </div>
-      )}
+      <ModalFormulario
+        aberto={modalAtual === 'compra-cartao'}
+        kicker="MOVIMENTAÇÃO"
+        titulo="Nova compra"
+        descricao="Registre uma nova compra no cartão."
+        tituloId="modal-compra-cartao-titulo"
+        aoFechar={fecharModal}
+      >
+        <FormularioCompraCartao
+          aoCriar={async (dados) => {
+            await handleCriarCompraCartao(dados)
+            fecharModal()
+          }}
+          aoCancelar={fecharModal}
+          cartoes={cartoes}
+          categorias={categorias}
+        />
+      </ModalFormulario>
     </>
   )
 }

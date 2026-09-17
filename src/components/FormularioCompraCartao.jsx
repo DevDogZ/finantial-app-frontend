@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioCompraCartao({ aoCriar, cartoes, categorias }) {
+function FormularioCompraCartao({ aoCriar, cartoes, categorias, aoCancelar }) {
   const [descricao, setDescricao] = useState('')
   const [valorTotal, setValorTotal] = useState('')
   const [numeroParcelas, setNumeroParcelas] = useState('1')
@@ -127,9 +127,14 @@ function FormularioCompraCartao({ aoCriar, cartoes, categorias }) {
         </div>
       )}
 
-      <button className="botao-principal" type="submit">
-        Registrar compra
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Registrar compra
+        </button>
+      </div>
     </form>
   )
 }

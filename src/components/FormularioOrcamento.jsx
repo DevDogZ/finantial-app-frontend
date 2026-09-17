@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioOrcamento({ aoCriar, categorias }) {
+function FormularioOrcamento({ aoCriar, categorias, aoCancelar }) {
   const [categoriaId, setCategoriaId] = useState('')
   const [mes, setMes] = useState('')
   const [ano, setAno] = useState('')
@@ -99,9 +99,14 @@ function FormularioOrcamento({ aoCriar, categorias }) {
         </div>
       )}
 
-      <button className="botao-principal" type="submit">
-        Criar orçamento
-      </button>
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
+          Criar orçamento
+        </button>
+      </div>
     </form>
   )
 }

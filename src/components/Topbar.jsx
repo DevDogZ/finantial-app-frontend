@@ -14,7 +14,7 @@ function Topbar({
           </span>
 
           <span>
-            𝓕𝓘𝓝𝓐𝓝𝓓𝓞𝓖
+            FinanDog
           </span>
         </div>
 

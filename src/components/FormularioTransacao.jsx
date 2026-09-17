@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function FormularioTransacao({ aoCriar, contas, categorias }) {
+function FormularioTransacao({ aoCriar, aoCancelar, contas, categorias }) {
   const [descricao, setDescricao] = useState('')
   const [valor, setValor] = useState('')
   const [tipo, setTipo] = useState('saida')
@@ -8,20 +8,12 @@ function FormularioTransacao({ aoCriar, contas, categorias }) {
   const [contaId, setContaId] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
 
-  function handleSubmit(evento) {
+  async function handleSubmit(evento) {
     evento.preventDefault()
 
-    if (
-      !descricao.trim() ||
-      valor === '' ||
-      !data ||
-      !contaId ||
-      !categoriaId
-    ) {
-      return
-    }
+    if (!descricao.trim() || valor === '' || !data || !contaId || !categoriaId) return
 
-    aoCriar({
+    await aoCriar({
       descricao: descricao.trim(),
       valor: parseFloat(valor),
       tipo,
@@ -39,16 +31,9 @@ function FormularioTransacao({ aoCriar, contas, categorias }) {
   }
 
   return (
-    <form
-      className="formulario-padrao formulario-transacao"
-      onSubmit={handleSubmit}
-    >
-
+    <form className="formulario-padrao formulario-transacao" onSubmit={handleSubmit}>
       <div className="campo campo-largo">
-        <label htmlFor="transacao-descricao">
-          Descrição
-        </label>
-
+        <label htmlFor="transacao-descricao">Descrição</label>
         <input
           id="transacao-descricao"
           type="text"
@@ -56,21 +41,14 @@ function FormularioTransacao({ aoCriar, contas, categorias }) {
           onChange={(evento) => setDescricao(evento.target.value)}
           placeholder="Ex.: Supermercado, salário, Pix..."
           required
-          autoFocus
         />
       </div>
 
-
       <div className="formulario-grid">
-
         <div className="campo">
-          <label htmlFor="transacao-valor">
-            Valor
-          </label>
-
+          <label htmlFor="transacao-valor">Valor</label>
           <div className="campo-prefixo">
             <span>R$</span>
-
             <input
               id="transacao-valor"
               type="number"
@@ -84,33 +62,20 @@ function FormularioTransacao({ aoCriar, contas, categorias }) {
           </div>
         </div>
 
-
         <div className="campo">
-          <label htmlFor="transacao-tipo">
-            Tipo
-          </label>
-
+          <label htmlFor="transacao-tipo">Tipo</label>
           <select
             id="transacao-tipo"
             value={tipo}
             onChange={(evento) => setTipo(evento.target.value)}
           >
-            <option value="saida">
-              Saída
-            </option>
-
-            <option value="entrada">
-              Entrada
-            </option>
+            <option value="saida">Saída</option>
+            <option value="entrada">Entrada</option>
           </select>
         </div>
 
-
         <div className="campo">
-          <label htmlFor="transacao-data">
-            Data
-          </label>
-
+          <label htmlFor="transacao-data">Data</label>
           <input
             id="transacao-data"
             type="date"
@@ -120,74 +85,49 @@ function FormularioTransacao({ aoCriar, contas, categorias }) {
           />
         </div>
 
-
         <div className="campo">
-          <label htmlFor="transacao-conta">
-            Conta
-          </label>
-
+          <label htmlFor="transacao-conta">Conta</label>
           <select
             id="transacao-conta"
             value={contaId}
             onChange={(evento) => setContaId(evento.target.value)}
             required
           >
-            <option value="">
-              Selecione a conta
-            </option>
-
+            <option value="">Selecione a conta</option>
             {contas.map((conta) => (
-              <option
-                key={conta.id}
-                value={conta.id}
-              >
+              <option key={conta.id} value={conta.id}>
                 {conta.nome}
               </option>
             ))}
           </select>
         </div>
 
-
         <div className="campo">
-          <label htmlFor="transacao-categoria">
-            Categoria
-          </label>
-
+          <label htmlFor="transacao-categoria">Categoria</label>
           <select
             id="transacao-categoria"
             value={categoriaId}
             onChange={(evento) => setCategoriaId(evento.target.value)}
             required
           >
-            <option value="">
-              Selecione a categoria
-            </option>
-
+            <option value="">Selecione a categoria</option>
             {categorias.map((categoria) => (
-              <option
-                key={categoria.id}
-                value={categoria.id}
-              >
+              <option key={categoria.id} value={categoria.id}>
                 {categoria.nome}
               </option>
             ))}
           </select>
         </div>
-
       </div>
 
-
-      <div className="formulario-acoes-transacao">
-
-        <button
-          className="botao-principal"
-          type="submit"
-        >
+      <div className="formulario-acoes-modal">
+        <button type="button" className="botao-secundario" onClick={aoCancelar}>
+          Cancelar
+        </button>
+        <button className="botao-principal" type="submit">
           Adicionar transação
         </button>
-
       </div>
-
     </form>
   )
 }
