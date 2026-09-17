@@ -1,266 +1,310 @@
 const BASE_URL = 'http://localhost:8000'
 
-export async function getCategorias() {
-  const resposta = await fetch(`${BASE_URL}/categorias`)
+function getToken() {
+  return localStorage.getItem('access_token')
+}
+
+async function request(endpoint, options = {}) {
+  const token = getToken()
+
+  const headers = {
+    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    ...(options.headers || {}),
+  }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  const resposta = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  })
+
+  if (!resposta.ok) {
+    let erro
+
+    try {
+      erro = await resposta.json()
+    } catch {
+      erro = {
+        detail: 'Ocorreu um erro na comunicação com o servidor',
+      }
+    }
+
+    if (resposta.status === 401) {
+      localStorage.removeItem('access_token')
+    }
+
+    throw new Error(
+      erro.detail || 'Ocorreu um erro na comunicação com o servidor'
+    )
+  }
+
   return resposta.json()
+}
+
+
+// ============================================================
+// AUTENTICAÇÃO
+// ============================================================
+
+export async function cadastrarUsuario(nome, email, senha) {
+  return request('/cadastro', {
+    method: 'POST',
+    body: JSON.stringify({
+      nome,
+      email,
+      senha,
+    }),
+  })
+}
+
+export async function login(email, senha) {
+  const resposta = await request('/login', {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      senha,
+    }),
+  })
+
+  localStorage.setItem('access_token', resposta.access_token)
+
+  return resposta
+}
+
+export async function getUsuarioAtual() {
+  return request('/me')
+}
+
+export function logout() {
+  localStorage.removeItem('access_token')
+}
+
+export function estaAutenticado() {
+  return Boolean(getToken())
+}
+
+
+// ============================================================
+// CATEGORIAS
+// ============================================================
+
+export async function getCategorias() {
+  return request('/categorias')
 }
 
 export async function criarCategoria(nome) {
-  const resposta = await fetch(`${BASE_URL}/categorias`, {
+  return request('/categorias', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nome }),
   })
-  return resposta.json()
-}
-
-export async function getContas() {
-  const resposta = await fetch(`${BASE_URL}/contas`)
-  return resposta.json()
-}
-
-export async function criarConta(nome, saldoInicial) {
-  const resposta = await fetch(`${BASE_URL}/contas`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome, saldo_inicial: saldoInicial }),
-  })
-  return resposta.json()
-}
-
-export async function getTransacoes(){
-  const resposta = await fetch(`${BASE_URL}/transacoes`)
-  return resposta.json()
-}
-
-export async function criarTransacao(dados) {
-  const resposta = await fetch(`${BASE_URL}/transacoes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados),
-  })
-  return resposta.json()
-}
-
-
-export async function getOrcamentos(){
-  const resposta = await fetch(`${BASE_URL}/orcamentos`)
-  return resposta.json()
-}
-
-export async function criarOrcamento(dados){
-  const resposta = await fetch(`${BASE_URL}/orcamentos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados)
-  })
-
-  if(!resposta.ok){
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function getMetas() {
-  const resposta = await fetch(`${BASE_URL}/metas`)
-  return resposta.json()
-}
-
-export async function criarMeta(nome, valorAlvo) {
-  const resposta = await fetch(`${BASE_URL}/metas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify( {nome, valor_alvo: valorAlvo })
-  })
-  return resposta.json()
-}
-
-export async function contribuirMeta(metaId, valor) {
-  const resposta = await fetch(`${BASE_URL}/metas/${metaId}/contribuir`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify({ valor })
-  })
-
-  if(!resposta.ok) {
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function getContasFixas() {
-  const resposta = await fetch(`${BASE_URL}/contas-fixas`)
-  return resposta.json()
-}
-
-export async function criarContaFixa(dados) {
-  const resposta = await fetch(`${BASE_URL}/contas-fixas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify(dados)
-  })
-
-  if(!resposta.ok){
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function pagarContaFixa(contaFixaId){
-  const resposta = await fetch(`${BASE_URL}/contas-fixas/${contaFixaId}/pagar`, {
-    method: 'POST', 
-  })
-  return resposta.json()
-}
-
-export async function desativarContaFixa(contaFixaId) {
-  const resposta = await fetch(`${BASE_URL}/contas-fixas/${contaFixaId}`, {
-    method: 'DELETE',
-  })
-  return resposta.json()
-}
-
-export async function getDividas() {
-  const resposta = await fetch(`${BASE_URL}/dividas`)
-  return resposta.json()
-}
-
-export async function criarDivida(dados) {
-  const resposta = await fetch(`${BASE_URL}/dividas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify(dados)
-  })
-
-  if(!resposta.ok) {
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function pagarParcelaDivida(dividaId){
-  const resposta = await fetch(`${BASE_URL}/dividas/${dividaId}/pagar-parcela`, {
-    method: 'POST'
-  })
-
-  if(!resposta.ok){
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function getCartoes(){
-  const resposta = await fetch(`${BASE_URL}/cartoes`)
-  return resposta.json()
-}
-
-export async function criarCartao(dados){
-  const resposta = await fetch(`${BASE_URL}/cartoes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados)
-  })
-  return resposta.json()
-}
-
-export async function criarCompraCartao(dados){
-  const resposta = await fetch(`${BASE_URL}/compras-cartao`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados)
-  })
-
-  if(!resposta.ok){
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
-
-  return resposta.json()
-}
-
-export async function getFatura(cartaoId, mes, ano){
-  const resposta = await fetch(`${BASE_URL}/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`)
-  return resposta.json()
-}
-
-export async function getSaldoConta(contaId){
-  const resposta = await fetch(`${BASE_URL}/contas/${contaId}/saldo`)
-  return resposta.json()
 }
 
 export async function deletarCategoria(categoriaId) {
-  const resposta = await fetch(`${BASE_URL}/categorias/${categoriaId}`, {
+  return request(`/categorias/${categoriaId}`, {
     method: 'DELETE',
   })
+}
 
-  if (!resposta.ok) {
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
 
-  return resposta.json()
+// ============================================================
+// CONTAS
+// ============================================================
+
+export async function getContas() {
+  return request('/contas')
+}
+
+export async function criarConta(nome, saldoInicial) {
+  return request('/contas', {
+    method: 'POST',
+    body: JSON.stringify({
+      nome,
+      saldo_inicial: saldoInicial,
+    }),
+  })
 }
 
 export async function deletarConta(contaId) {
-  const resposta = await fetch(`${BASE_URL}/contas/${contaId}`, {
+  return request(`/contas/${contaId}`, {
     method: 'DELETE',
   })
+}
 
-  if (!resposta.ok) {
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
+export async function getSaldoConta(contaId) {
+  return request(`/contas/${contaId}/saldo`)
+}
 
-  return resposta.json()
+
+// ============================================================
+// TRANSAÇÕES
+// ============================================================
+
+export async function getTransacoes() {
+  return request('/transacoes')
+}
+
+export async function criarTransacao(dados) {
+  return request('/transacoes', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
 }
 
 export async function deletarTransacao(transacaoId) {
-  const resposta = await fetch(`${BASE_URL}/transacoes/${transacaoId}`, {
+  return request(`/transacoes/${transacaoId}`, {
     method: 'DELETE',
   })
-  return resposta.json()
+}
+
+
+// ============================================================
+// ORÇAMENTOS
+// ============================================================
+
+export async function getOrcamentos() {
+  return request('/orcamentos')
+}
+
+export async function criarOrcamento(dados) {
+  return request('/orcamentos', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
 }
 
 export async function deletarOrcamento(orcamentoId) {
-  const resposta = await fetch(`${BASE_URL}/orcamentos/${orcamentoId}`, {
+  return request(`/orcamentos/${orcamentoId}`, {
     method: 'DELETE',
   })
-  return resposta.json()
+}
+
+
+// ============================================================
+// METAS
+// ============================================================
+
+export async function getMetas() {
+  return request('/metas')
+}
+
+export async function criarMeta(nome, valorAlvo) {
+  return request('/metas', {
+    method: 'POST',
+    body: JSON.stringify({
+      nome,
+      valor_alvo: valorAlvo,
+    }),
+  })
+}
+
+export async function contribuirMeta(metaId, valor) {
+  return request(`/metas/${metaId}/contribuir`, {
+    method: 'POST',
+    body: JSON.stringify({ valor }),
+  })
 }
 
 export async function deletarMeta(metaId) {
-  const resposta = await fetch(`${BASE_URL}/metas/${metaId}`, {
+  return request(`/metas/${metaId}`, {
     method: 'DELETE',
   })
-  return resposta.json()
+}
+
+
+// ============================================================
+// CONTAS FIXAS
+// ============================================================
+
+export async function getContasFixas() {
+  return request('/contas-fixas')
+}
+
+export async function criarContaFixa(dados) {
+  return request('/contas-fixas', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
+}
+
+export async function pagarContaFixa(contaFixaId) {
+  return request(`/contas-fixas/${contaFixaId}/pagar`, {
+    method: 'POST',
+  })
+}
+
+export async function desativarContaFixa(contaFixaId) {
+  return request(`/contas-fixas/${contaFixaId}`, {
+    method: 'DELETE',
+  })
+}
+
+
+// ============================================================
+// DÍVIDAS
+// ============================================================
+
+export async function getDividas() {
+  return request('/dividas')
+}
+
+export async function criarDivida(dados) {
+  return request('/dividas', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
+}
+
+export async function pagarParcelaDivida(dividaId) {
+  return request(`/dividas/${dividaId}/pagar-parcela`, {
+    method: 'POST',
+  })
 }
 
 export async function deletarDivida(dividaId) {
-  const resposta = await fetch(`${BASE_URL}/dividas/${dividaId}`, {
+  return request(`/dividas/${dividaId}`, {
     method: 'DELETE',
   })
-  return resposta.json()
+}
+
+
+// ============================================================
+// CARTÕES
+// ============================================================
+
+export async function getCartoes() {
+  return request('/cartoes')
+}
+
+export async function criarCartao(dados) {
+  return request('/cartoes', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
 }
 
 export async function deletarCartao(cartaoId) {
-  const resposta = await fetch(`${BASE_URL}/cartoes/${cartaoId}`, {
+  return request(`/cartoes/${cartaoId}`, {
     method: 'DELETE',
   })
+}
 
-  if (!resposta.ok) {
-    const erro = await resposta.json()
-    throw new Error(erro.detail)
-  }
 
-  return resposta.json()
+// ============================================================
+// COMPRAS NO CARTÃO
+// ============================================================
+
+export async function criarCompraCartao(dados) {
+  return request('/compras-cartao', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  })
+}
+
+export async function getFatura(cartaoId, mes, ano) {
+  return request(
+    `/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`
+  )
 }

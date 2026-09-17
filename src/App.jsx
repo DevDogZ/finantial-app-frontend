@@ -1,16 +1,17 @@
-import { useState, useEffect, useActionState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   getCategorias, criarCategoria,
   getContas, criarConta,
   getTransacoes, criarTransacao,
   getOrcamentos, criarOrcamento,
   getMetas, criarMeta, contribuirMeta,
-  getContasFixas, criarContaFixa, 
+  getContasFixas, criarContaFixa,
   pagarContaFixa, desativarContaFixa,
   getDividas, criarDivida, pagarParcelaDivida,
   getCartoes, criarCartao, criarCompraCartao,
   deletarCategoria, deletarConta, deletarTransacao,
-  deletarOrcamento, deletarMeta, deletarDivida, deletarCartao,
+  deletarOrcamento, deletarMeta, deletarDivida, deletarCartao, login,
+  cadastrarUsuario, getUsuarioAtual, logout, estaAutenticado,
 } from './api'
 import FormularioCategoria from './components/FormularioCategoria'
 import ListaCategorias from './components/ListaCategorias'
@@ -30,11 +31,16 @@ import ListaComprasCartao from './components/ListaComprasCartao'
 import VisualizadorFatura from './components/VisualizadorFatura'
 import FormularioCartao from './components/FormularioCartao'
 import ListaCartoes from './components/ListaCartoes'
+import FormularioLogin from './components/FormularioLogin'
+import FormularioCadastro from './components/FormularioCadastro'
 
 import './App.css'
 import FormularioMeta from './components/FormularioMeta'
 
 function App() {
+  const [autenticado, setAutenticado] = useState(estaAutenticado())
+  const [usuario, setUsuario] = useState(null)
+  const [mostrarCadastro, setMostrarCadastro] = useState(false)
   const [categorias, setCategorias] = useState([])
   const [contas, setContas] = useState([])
   const [transacoes, setTransacoes] = useState([])
@@ -46,6 +52,23 @@ function App() {
   const [comprasCartao, setComprasCartao] = useState([])
 
   useEffect(() => {
+    if (!autenticado) {
+      return
+    }
+
+    async function carregarUsuario() {
+      try {
+        const dados = await getUsuarioAtual()
+        setUsuario(dados)
+      } catch {
+        logout()
+        setAutenticado(false)
+        return
+      }
+    }
+
+    carregarUsuario()
+
     carregarCategorias()
     carregarContas()
     carregarTransacoes()
@@ -54,13 +77,36 @@ function App() {
     carregarContasFixas()
     carregarDividas()
     carregarCartoes()
-  }, [])
+  }, [autenticado])
 
-  async function carregarCartoes(){
+
+
+  async function handleLogin(email, senha) {
+    await login(email, senha)
+
+    const dadosUsuario = await getUsuarioAtual()
+
+    setUsuario(dadosUsuario)
+    setAutenticado(true)
+    setMostrarCadastro(false)
+  }
+
+  async function handleCadastro(nome, email, senha) {
+    await cadastrarUsuario(nome, email, senha)
+    setMostrarCadastro(false)
+  }
+
+  function handleLogout() {
+    logout()
+    setUsuario(null)
+    setAutenticado(false)
+  }
+
+  async function carregarCartoes() {
     setCartoes(await getCartoes())
   }
 
-  async function handleCriarCartao(dados){
+  async function handleCriarCartao(dados) {
     await criarCartao(dados)
     carregarCartoes()
   }
@@ -121,18 +167,18 @@ function App() {
     setDividas(await getDividas())
   }
 
-  async function handleCriarDivida(dados){
+  async function handleCriarDivida(dados) {
     await criarDivida(dados)
     carregarDividas()
   }
 
-  async function handlePagarParcelaDivida(id){
+  async function handlePagarParcelaDivida(id) {
     await pagarParcelaDivida(id)
     carregarDividas()
     carregarTransacoes()
   }
 
-  async function carregarContasFixas(){
+  async function carregarContasFixas() {
     setContasFixas(await getContasFixas())
   }
 
@@ -141,17 +187,17 @@ function App() {
     carregarContasFixas()
   }
 
-  async function handlePagarContaFixa(id){
+  async function handlePagarContaFixa(id) {
     await pagarContaFixa(id)
     carregarTransacoes()
   }
 
-  async function handleDesativarContaFixa(id){
+  async function handleDesativarContaFixa(id) {
     await desativarContaFixa(id)
     carregarContasFixas()
   }
 
-  async function carregarMetas(){
+  async function carregarMetas() {
     setMetas(await getMetas())
   }
 
@@ -169,11 +215,11 @@ function App() {
     setCategorias(await getCategorias())
   }
 
-  async function carregarOrcamentos(){
+  async function carregarOrcamentos() {
     setOrcamentos(await getOrcamentos())
   }
 
-  async function handleCriarOrcamento(dados){
+  async function handleCriarOrcamento(dados) {
     await criarOrcamento(dados)
     carregarOrcamentos()
   }
@@ -201,65 +247,101 @@ function App() {
     carregarTransacoes()
   }
 
+  if (!autenticado) {
+    if (mostrarCadastro) {
+      return (
+        <div className="app">
+          <FormularioCadastro
+            aoCadastrar={handleCadastro}
+            aoVoltar={() => setMostrarCadastro(false)}
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div className="app">
+        <FormularioLogin
+          aoEntrar={handleLogin}
+          aoIrParaCadastro={() => setMostrarCadastro(true)}
+        />
+      </div>
+    )
+  }
+
   return (
-  <div className="app">
-    <h1 className="app-titulo">Financas da Casa</h1>
+    <div className="app">
+      <div>
+        <h1 className="app-titulo">Financas da Casa</h1>
 
-    <section className="card">
-      <h2>Categorias</h2>
-      <FormularioCategoria aoCriar={handleCriarCategoria} />
-      <ListaCategorias categorias={categorias} aoDeletar={handleDeletarCategoria} />
-    </section>
+        {usuario && (
+          <div>
+            <span>
+              Olá, {usuario.nome}!
+            </span>
 
-    <section className="card">
-      <h2>Contas</h2>
-      <FormularioConta aoCriar={handleCriarConta} />
-      <ListaContas contas={contas} aoDeletar={handleDeletarConta} />
-    </section>
+            <button onClick={handleLogout}>
+              Sair
+            </button>
+          </div>
+        )}
+      </div>
 
-    <section className="card">
-      <h2>Transacoes</h2>
-      <FormularioTransacao aoCriar={handleCriarTransacao} contas={contas} categorias={categorias} />
-      <ListaTransacoes transacoes={transacoes} aoDeletar={handleDeletarTransacao} />
-    </section>
+      <section className="card">
+        <h2>Categorias</h2>
+        <FormularioCategoria aoCriar={handleCriarCategoria} />
+        <ListaCategorias categorias={categorias} aoDeletar={handleDeletarCategoria} />
+      </section>
 
-    <section className="card">
-      <h2>Orcamentos</h2>
-      <FormularioOrcamento aoCriar={handleCriarOrcamento} categorias={categorias} />
-      <ListaOrcamentos orcamentos={orcamentos} aoDeletar={handleDeletarOrcamento} />
-    </section>
+      <section className="card">
+        <h2>Contas</h2>
+        <FormularioConta aoCriar={handleCriarConta} />
+        <ListaContas contas={contas} aoDeletar={handleDeletarConta} />
+      </section>
 
-    <section className="card">
-      <h2>Metas</h2>
-      <FormularioMeta aoCriar={handleCriarMeta} />
-      <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} aoDeletar={handleDeletarMeta} />
-    </section>
+      <section className="card">
+        <h2>Transacoes</h2>
+        <FormularioTransacao aoCriar={handleCriarTransacao} contas={contas} categorias={categorias} />
+        <ListaTransacoes transacoes={transacoes} aoDeletar={handleDeletarTransacao} />
+      </section>
 
-    <section className="card">
-      <h2>Contas Fixas</h2>
-      <FormularioContaFixa aoCriar={handleCriarContaFixa} contas={contas} categorias={categorias} />
-      <ListaContasFixas contasFixas={contasFixas} aoPagar={handlePagarContaFixa} aoDesativar={handleDesativarContaFixa} />
-    </section>
+      <section className="card">
+        <h2>Orcamentos</h2>
+        <FormularioOrcamento aoCriar={handleCriarOrcamento} categorias={categorias} />
+        <ListaOrcamentos orcamentos={orcamentos} aoDeletar={handleDeletarOrcamento} />
+      </section>
 
-    <section className="card">
-      <h2>Dividas</h2>
-      <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias} />
-      <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} aoDeletar={handleDeletarDivida} />
-    </section>
+      <section className="card">
+        <h2>Metas</h2>
+        <FormularioMeta aoCriar={handleCriarMeta} />
+        <ListaMetas metas={metas} aoContribuir={handleContribuirMeta} aoDeletar={handleDeletarMeta} />
+      </section>
 
-    <section className="card">
-      <h2>Cartoes de Credito</h2>
-      <FormularioCartao aoCriar={handleCriarCartao} />
-      <ListaCartoes cartoes={cartoes} aoDeletar={handleDeletarCartao} />
-      <h3>Nova compra</h3>
-      <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias} />
-      <h3>Compras registradas</h3>
-      <ListaComprasCartao compras={comprasCartao} />
-      <h3>Consultar fatura</h3>
-      <VisualizadorFatura cartoes={cartoes} />
-    </section>
-  </div>
-)
+      <section className="card">
+        <h2>Contas Fixas</h2>
+        <FormularioContaFixa aoCriar={handleCriarContaFixa} contas={contas} categorias={categorias} />
+        <ListaContasFixas contasFixas={contasFixas} aoPagar={handlePagarContaFixa} aoDesativar={handleDesativarContaFixa} />
+      </section>
+
+      <section className="card">
+        <h2>Dividas</h2>
+        <FormularioDivida aoCriar={handleCriarDivida} contas={contas} categorias={categorias} />
+        <ListaDividas dividas={dividas} aoPagarParcela={handlePagarParcelaDivida} aoDeletar={handleDeletarDivida} />
+      </section>
+
+      <section className="card">
+        <h2>Cartoes de Credito</h2>
+        <FormularioCartao aoCriar={handleCriarCartao} />
+        <ListaCartoes cartoes={cartoes} aoDeletar={handleDeletarCartao} />
+        <h3>Nova compra</h3>
+        <FormularioCompraCartao aoCriar={handleCriarCompraCartao} cartoes={cartoes} categorias={categorias} />
+        <h3>Compras registradas</h3>
+        <ListaComprasCartao compras={comprasCartao} />
+        <h3>Consultar fatura</h3>
+        <VisualizadorFatura cartoes={cartoes} />
+      </section>
+    </div>
+  )
 }
 
 export default App
