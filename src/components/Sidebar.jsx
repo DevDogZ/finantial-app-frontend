@@ -49,6 +49,16 @@ function Sidebar({
       icone: '▤',
       nome: 'Cartões',
     },
+    {
+      id: 'compras',
+      icone: '▦',
+      nome: 'Compras',
+    },
+    {
+      id: 'fatura',
+      icone: '▧',
+      nome: 'Fatura',
+    },
   ]
 
 

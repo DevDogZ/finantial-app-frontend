@@ -155,6 +155,8 @@ body {
 
   padding: 24px 16px;
 
+  overflow: hidden;
+
   z-index: 10;
 }
 
@@ -231,6 +233,31 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-right: 4px;
+  margin-right: -4px;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157, 78, 221, 0.35) transparent;
+}
+
+.sidebar-navegacao::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-navegacao::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.35);
+  border-radius: 10px;
+}
+
+.sidebar-navegacao::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 
@@ -2061,28 +2088,41 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 .campo-senha {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .campo-senha input {
   width: 100%;
   box-sizing: border-box;
-  padding-right: 100px;
+  padding-right: 84px;
 }
 
 .botao-mostrar-senha {
   position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
+  right: 4px;
+  margin: auto 0;
+
+  display: flex;
+  align-items: center;
+
+  height: fit-content;
+  max-height: calc(100% - 12px);
 
   border: none;
   background: transparent;
-  padding: 4px 0;
+  padding: 6px 12px;
+  border-radius: 8px;
 
   color: #b879ff;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
+  z-index: 2;
 }
 
 .botao-mostrar-senha:hover {
@@ -2161,6 +2201,29 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   margin: 0;
   padding: 0;
   list-style: none;
+
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-right: 6px;
+  margin-right: -6px;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157, 78, 221, 0.35) transparent;
+}
+
+.lista-registros::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-registros::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.35);
+  border-radius: 10px;
+}
+
+.lista-registros::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .registro-card {

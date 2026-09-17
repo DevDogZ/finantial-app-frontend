@@ -1122,6 +1122,35 @@ function App() {
                 aoDeletar={handleDeletarCartao}
               />
             </div>
+          </div>
+        )
+
+
+      case 'compras':
+        return (
+          <div className="pagina">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
+              <div>
+                <span className="pagina-kicker">
+                  CRÉDITO
+                </span>
+
+                <h1>Compras</h1>
+
+                <p>
+                  Acompanhe as compras feitas nos seus cartões.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={() => abrirModal('compra-cartao')}
+              >
+                <span>+</span>
+                Nova compra
+              </button>
+            </div>
 
             <div className="painel">
               <div className="painel-cabecalho">
@@ -1132,19 +1161,31 @@ function App() {
 
                   <h2>Compras</h2>
                 </div>
-
-                <button
-                  type="button"
-                  className="botao-secundario"
-                  onClick={() => abrirModal('compra-cartao')}
-                >
-                  + Nova compra
-                </button>
               </div>
 
               <ListaComprasCartao
                 compras={comprasCartao}
               />
+            </div>
+          </div>
+        )
+
+
+      case 'fatura':
+        return (
+          <div className="pagina">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
+              <div>
+                <span className="pagina-kicker">
+                  CRÉDITO
+                </span>
+
+                <h1>Fatura</h1>
+
+                <p>
+                  Consulte a fatura de um cartão por mês e ano.
+                </p>
+              </div>
             </div>
 
             <div className="painel">

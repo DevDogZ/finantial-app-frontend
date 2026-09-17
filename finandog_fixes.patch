@@ -1,0 +1,232 @@
+diff --git a/src/App.css b/src/App.css
+index 1655dd3..d893215 100644
+--- a/src/App.css
++++ b/src/App.css
+@@ -2061,28 +2061,41 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
+ .campo-senha {
+   position: relative;
+   width: 100%;
++  display: flex;
++  align-items: center;
+ }
+ 
+ .campo-senha input {
+   width: 100%;
+   box-sizing: border-box;
+-  padding-right: 100px;
++  padding-right: 84px;
+ }
+ 
+ .botao-mostrar-senha {
+   position: absolute;
+-  top: 50%;
+-  right: 16px;
+-  transform: translateY(-50%);
++  top: 0;
++  bottom: 0;
++  right: 4px;
++  margin: auto 0;
++
++  display: flex;
++  align-items: center;
++
++  height: fit-content;
++  max-height: calc(100% - 12px);
+ 
+   border: none;
+   background: transparent;
+-  padding: 4px 0;
++  padding: 6px 12px;
++  border-radius: 8px;
+ 
+   color: #b879ff;
+-  font-size: 16px;
++  font-size: 13px;
+   font-weight: 700;
++  line-height: 1;
++  white-space: nowrap;
+   cursor: pointer;
++  z-index: 2;
+ }
+ 
+ .botao-mostrar-senha:hover {
+diff --git a/src/App.jsx b/src/App.jsx
+index aaa6239..5dfead6 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -1122,6 +1122,35 @@ function App() {
+                 aoDeletar={handleDeletarCartao}
+               />
+             </div>
++          </div>
++        )
++
++
++      case 'compras':
++        return (
++          <div className="pagina">
++            <div className="pagina-cabecalho pagina-cabecalho-acoes">
++              <div>
++                <span className="pagina-kicker">
++                  CRÉDITO
++                </span>
++
++                <h1>Compras</h1>
++
++                <p>
++                  Acompanhe as compras feitas nos seus cartões.
++                </p>
++              </div>
++
++              <button
++                type="button"
++                className="botao-principal botao-acao-pagina"
++                onClick={() => abrirModal('compra-cartao')}
++              >
++                <span>+</span>
++                Nova compra
++              </button>
++            </div>
+ 
+             <div className="painel">
+               <div className="painel-cabecalho">
+@@ -1132,20 +1161,32 @@ function App() {
+ 
+                   <h2>Compras</h2>
+                 </div>
+-
+-                <button
+-                  type="button"
+-                  className="botao-secundario"
+-                  onClick={() => abrirModal('compra-cartao')}
+-                >
+-                  + Nova compra
+-                </button>
+               </div>
+ 
+               <ListaComprasCartao
+                 compras={comprasCartao}
+               />
+             </div>
++          </div>
++        )
++
++
++      case 'fatura':
++        return (
++          <div className="pagina">
++            <div className="pagina-cabecalho pagina-cabecalho-acoes">
++              <div>
++                <span className="pagina-kicker">
++                  CRÉDITO
++                </span>
++
++                <h1>Fatura</h1>
++
++                <p>
++                  Consulte a fatura de um cartão por mês e ano.
++                </p>
++              </div>
++            </div>
+ 
+             <div className="painel">
+               <div className="painel-cabecalho">
+diff --git a/src/components/Sidebar.jsx b/src/components/Sidebar.jsx
+index 9cfc2ef..0b7dda4 100644
+--- a/src/components/Sidebar.jsx
++++ b/src/components/Sidebar.jsx
+@@ -49,6 +49,16 @@ function Sidebar({
+       icone: '▤',
+       nome: 'Cartões',
+     },
++    {
++      id: 'compras',
++      icone: '▦',
++      nome: 'Compras',
++    },
++    {
++      id: 'fatura',
++      icone: '▧',
++      nome: 'Fatura',
++    },
+   ]
+ 
+ 
+diff --git a/src/components/VisualizadorFatura.jsx b/src/components/VisualizadorFatura.jsx
+index 067867a..dc9fd6d 100644
+--- a/src/components/VisualizadorFatura.jsx
++++ b/src/components/VisualizadorFatura.jsx
+@@ -14,32 +14,49 @@ function VisualizadorFatura({ cartoes }){
+     }
+ 
+     return (
+-        <div>
+-            <select value={cartaoId} onChange={(evento) => setCartaoId(evento.target.value)}>
+-                <option value="">Selecione o cartao</option>
+-                {cartoes.map((cartao) => <option key={cartao.id} value={cartao.id}>{cartao.nome}</option>)}
+-            </select>
+-
+-            <input 
+-                type="number"
+-                min="1"
+-                max="12"
+-                value={mes}
+-                onChange={(evento) => setMes(evento.target.value)}
+-                placeholder="Mes"
+-            />
+-
+-            <input 
+-                type="number"
+-                value={ano}
+-                onChange={(evento) => setAno(evento.target.value)}
+-                placeholder="Ano"
+-            />
+-
+-            <button onClick={handleBuscar}>Ver fatura</button>
++        <div className="formulario-padrao">
++            <div className="formulario-grid">
++                <div className="campo campo-largo">
++                    <label htmlFor="fatura-cartao">Cartão</label>
++                    <select
++                        id="fatura-cartao"
++                        value={cartaoId}
++                        onChange={(evento) => setCartaoId(evento.target.value)}
++                    >
++                        <option value="">Selecione o cartao</option>
++                        {cartoes.map((cartao) => <option key={cartao.id} value={cartao.id}>{cartao.nome}</option>)}
++                    </select>
++                </div>
++
++                <div className="campo">
++                    <label htmlFor="fatura-mes">Mês</label>
++                    <input
++                        id="fatura-mes"
++                        type="number"
++                        min="1"
++                        max="12"
++                        value={mes}
++                        onChange={(evento) => setMes(evento.target.value)}
++                        placeholder="Mes"
++                    />
++                </div>
++
++                <div className="campo">
++                    <label htmlFor="fatura-ano">Ano</label>
++                    <input
++                        id="fatura-ano"
++                        type="number"
++                        value={ano}
++                        onChange={(evento) => setAno(evento.target.value)}
++                        placeholder="Ano"
++                    />
++                </div>
++            </div>
++
++            <button className="botao-principal" onClick={handleBuscar}>Ver fatura</button>
+ 
+             {fatura && (
+-                <div>
++                <div className="painel painel-fatura-resultado">
+                     <h3>Fatura {fatura.mes}/{fatura.ano} - Total: R$ {fatura.total}</h3>
+                     <ul>
+                         {fatura.parcelas.map((parcela) => (
