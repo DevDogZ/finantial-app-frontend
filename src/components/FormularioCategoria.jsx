@@ -5,19 +5,29 @@ function FormularioCategoria({ aoCriar }) {
 
   function handleSubmit(evento) {
     evento.preventDefault()
-    aoCriar(nome)
+    if (!nome.trim()) return
+
+    aoCriar(nome.trim())
     setNome('')
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={nome}
-        onChange={(evento) => setNome(evento.target.value)}
-        placeholder="Nome da categoria"
-      />
-      <button type="submit">Adicionar</button>
+    <form className="formulario-padrao" onSubmit={handleSubmit}>
+      <div className="campo">
+        <label htmlFor="categoria-nome">Nome da categoria</label>
+        <input
+          id="categoria-nome"
+          type="text"
+          value={nome}
+          onChange={(evento) => setNome(evento.target.value)}
+          placeholder="Ex.: Alimentação"
+          required
+        />
+      </div>
+
+      <button className="botao-principal" type="submit">
+        Adicionar categoria
+      </button>
     </form>
   )
 }

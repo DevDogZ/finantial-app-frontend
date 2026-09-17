@@ -1,26 +1,22 @@
-:root {
-  --cor-fundo: #f4f5f7;
-  --cor-card: #ffffff;
-  --cor-texto: #1f2937;
-  --cor-texto-suave: #6b7280;
-  --cor-primaria: #2563eb;
-  --cor-primaria-hover: #1d4ed8;
-  --cor-perigo: #dc2626;
-  --cor-sucesso: #16a34a;
-  --cor-borda: #e5e7eb;
-  --espaco-pequeno: 8px;
-  --espaco-medio: 16px;
-  --espaco-grande: 24px;
-  --raio-borda: 8px;
+html {
+  min-height: 100%;
 }
 
-* {
-  box-sizing: border-box;
-}
 
 body {
+  min-height: 100%;
+}
+
+
+html,
+body,
+#root {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background-color: var(--cor-fundo);
-  color: var(--cor-texto);
+  padding: 0;
+  width: 100%;
+}
+
+
+body {
+  overflow-x: hidden;
 }
