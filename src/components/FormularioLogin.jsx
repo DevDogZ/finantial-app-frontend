@@ -47,20 +47,24 @@ function FormularioLogin({ aoEntrar, aoIrParaCadastro }) {
           />
         </div>
 
-        <div className="campo">
+                <div className="campo">
           <label htmlFor="login-senha">Senha</label>
           <div className="campo-senha">
             <input
+              id="login-senha"
               type={mostrarSenha ? 'text' : 'password'}
               placeholder="Digite sua senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
+              autoComplete="current-password"
+              required
             />
 
             <button
               type="button"
               className="botao-mostrar-senha"
               onClick={() => setMostrarSenha(!mostrarSenha)}
+              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
             >
               {mostrarSenha ? 'Ocultar' : 'Mostrar'}
             </button>

@@ -308,3 +308,45 @@ export async function getFatura(cartaoId, mes, ano) {
     `/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`
   )
 }
+
+// ============================================================
+// RELATÓRIOS
+// ============================================================
+
+export async function exportarRelatorioPdf(mes, ano) {
+  const token = getToken()
+
+  const resposta = await fetch(
+    `${BASE_URL}/relatorios/pdf?mes=${mes}&ano=${ano}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  if (!resposta.ok) {
+    let erro
+    try {
+      erro = await resposta.json()
+    } catch {
+      erro = { detail: 'Erro ao gerar o relatório PDF' }
+    }
+
+    if (resposta.status === 401) {
+      localStorage.removeItem('access_token')
+    }
+
+    throw new Error(erro.detail || 'Erro ao gerar o relatório PDF')
+  }
+
+  const blob = await resposta.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `relatorio-financas-${ano}-${String(mes).padStart(2, '0')}.pdf`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}

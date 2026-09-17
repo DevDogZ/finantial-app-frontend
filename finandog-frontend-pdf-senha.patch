@@ -1,0 +1,234 @@
+diff --git a/src/App.css b/src/App.css
+index d51f972..1ea2e17 100644
+--- a/src/App.css
++++ b/src/App.css
+@@ -1392,7 +1392,7 @@ button:disabled {
+    BOTÕES DENTRO DOS FORMULÁRIOS
+    ------------------------------------------------------------ */
+ 
+-form button {
++form button:not(.botao-mostrar-senha) {
+   width: 100%;
+   margin-top: 4px;
+ }
+@@ -1574,7 +1574,7 @@ li button:hover {
+   font-size: 15px;
+ }
+ 
+-.auth-container form button {
++.auth-container form button:not(.botao-mostrar-senha) {
+   min-height: 48px;
+ 
+   margin-top: 6px;
+@@ -2088,45 +2088,49 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
+ .campo-senha {
+   position: relative;
+   width: 100%;
+-  display: flex;
+-  align-items: center;
+ }
+ 
+ .campo-senha input {
+   width: 100%;
+   box-sizing: border-box;
+-  padding-right: 84px;
++  padding-right: 92px;
+ }
+ 
+ .botao-mostrar-senha {
+-  position: absolute;
+-  top: 0;
+-  bottom: 0;
+-  right: 4px;
+-  margin: auto 0;
++  position: absolute !important;
++  top: 50% !important;
++  right: 10px !important;
++  bottom: auto !important;
++  left: auto !important;
++  transform: translateY(-50%);
+ 
+   display: flex;
+   align-items: center;
++  justify-content: center;
+ 
+-  height: fit-content;
+-  max-height: calc(100% - 12px);
++  width: auto !important;
++  min-height: 0 !important;
++  height: auto !important;
++  margin: 0 !important;
+ 
+   border: none;
+-  background: transparent;
++  background: rgba(157, 78, 221, 0.12);
+   padding: 6px 12px;
+   border-radius: 8px;
+ 
+-  color: #b879ff;
+-  font-size: 13px;
++  color: #c792ea;
++  font-size: 12px;
+   font-weight: 700;
+   line-height: 1;
+   white-space: nowrap;
+   cursor: pointer;
+-  z-index: 2;
++  z-index: 3;
++  transition: background 0.15s ease, color 0.15s ease;
+ }
+ 
+ .botao-mostrar-senha:hover {
+-  color: #d19aff;
++  background: rgba(157, 78, 221, 0.22);
++  color: #e0b0ff;
+ }
+ 
+ .auth-submit {
+diff --git a/src/App.jsx b/src/App.jsx
+index 5dfead6..51b35fc 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -34,6 +34,7 @@ import {
+   getUsuarioAtual,
+   logout,
+   estaAutenticado,
++  exportarRelatorioPdf,
+ } from './api'
+ 
+ import FormularioCategoria from './components/FormularioCategoria'
+@@ -90,6 +91,7 @@ function App() {
+   const [cartoes, setCartoes] = useState([])
+   const [comprasCartao, setComprasCartao] = useState([])
+   const [modalAtual, setModalAtual] = useState(null)
++  const [exportandoPdf, setExportandoPdf] = useState(false)
+ 
+ 
+   // ============================================================
+@@ -123,6 +125,22 @@ function App() {
+   }
+ 
+ 
++  async function handleExportarPdf() {
++    const agora = new Date()
++    const mes = agora.getMonth() + 1
++    const ano = agora.getFullYear()
++
++    setExportandoPdf(true)
++    try {
++      await exportarRelatorioPdf(mes, ano)
++    } catch (e) {
++      alert(e.message || 'Não foi possível gerar o relatório.')
++    } finally {
++      setExportandoPdf(false)
++    }
++  }
++
++
+   // ============================================================
+   // CARREGAMENTO INICIAL
+   // ============================================================
+@@ -503,7 +521,7 @@ function App() {
+         return (
+           <div className="pagina">
+ 
+-            <div className="pagina-cabecalho">
++            <div className="pagina-cabecalho pagina-cabecalho-acoes">
+               <div>
+                 <span className="pagina-kicker">
+                   VISÃO GERAL
+@@ -515,6 +533,16 @@ function App() {
+                   Bem-vindo ao FinanDog. Seu dinheiro, organizado do seu jeito.
+                 </p>
+               </div>
++
++              <button
++                type="button"
++                className="botao-principal botao-acao-pagina"
++                onClick={handleExportarPdf}
++                disabled={exportandoPdf}
++              >
++                <span>📄</span>
++                {exportandoPdf ? 'Gerando PDF...' : 'Exportar relatório'}
++              </button>
+             </div>
+ 
+ 
+diff --git a/src/api.js b/src/api.js
+index 684a6ab..b56d98a 100644
+--- a/src/api.js
++++ b/src/api.js
+@@ -307,4 +307,46 @@ export async function getFatura(cartaoId, mes, ano) {
+   return request(
+     `/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`
+   )
+-}
+\ No newline at end of file
++}
++
++// ============================================================
++// RELATÓRIOS
++// ============================================================
++
++export async function exportarRelatorioPdf(mes, ano) {
++  const token = getToken()
++
++  const resposta = await fetch(
++    `${BASE_URL}/relatorios/pdf?mes=${mes}&ano=${ano}`,
++    {
++      headers: {
++        Authorization: `Bearer ${token}`,
++      },
++    }
++  )
++
++  if (!resposta.ok) {
++    let erro
++    try {
++      erro = await resposta.json()
++    } catch {
++      erro = { detail: 'Erro ao gerar o relatório PDF' }
++    }
++
++    if (resposta.status === 401) {
++      localStorage.removeItem('access_token')
++    }
++
++    throw new Error(erro.detail || 'Erro ao gerar o relatório PDF')
++  }
++
++  const blob = await resposta.blob()
++  const url = window.URL.createObjectURL(blob)
++  const a = document.createElement('a')
++  a.href = url
++  a.download = `relatorio-financas-${ano}-${String(mes).padStart(2, '0')}.pdf`
++  document.body.appendChild(a)
++  a.click()
++  a.remove()
++  window.URL.revokeObjectURL(url)
++}
+diff --git a/src/components/FormularioLogin.jsx b/src/components/FormularioLogin.jsx
+index cf9ceba..89c124a 100644
+--- a/src/components/FormularioLogin.jsx
++++ b/src/components/FormularioLogin.jsx
+@@ -51,16 +51,20 @@ function FormularioLogin({ aoEntrar, aoIrParaCadastro }) {
+           <label htmlFor="login-senha">Senha</label>
+           <div className="campo-senha">
+             <input
++              id="login-senha"
+               type={mostrarSenha ? 'text' : 'password'}
+               placeholder="Digite sua senha"
+               value={senha}
+               onChange={(e) => setSenha(e.target.value)}
++              autoComplete="current-password"
++              required
+             />
+ 
+             <button
+               type="button"
+               className="botao-mostrar-senha"
+               onClick={() => setMostrarSenha(!mostrarSenha)}
++              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+             >
+               {mostrarSenha ? 'Ocultar' : 'Mostrar'}
+             </button>

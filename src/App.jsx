@@ -34,6 +34,7 @@ import {
   getUsuarioAtual,
   logout,
   estaAutenticado,
+  exportarRelatorioPdf,
 } from './api'
 
 import FormularioCategoria from './components/FormularioCategoria'
@@ -90,6 +91,7 @@ function App() {
   const [cartoes, setCartoes] = useState([])
   const [comprasCartao, setComprasCartao] = useState([])
   const [modalAtual, setModalAtual] = useState(null)
+  const [exportandoPdf, setExportandoPdf] = useState(false)
 
 
   // ============================================================
@@ -120,6 +122,22 @@ function App() {
     setAutenticado(false)
     setPaginaAtual('dashboard')
     setModalAtual(null)
+  }
+
+
+    async function handleExportarPdf() {
+    const agora = new Date()
+    const mes = agora.getMonth() + 1
+    const ano = agora.getFullYear()
+
+    setExportandoPdf(true)
+    try {
+      await exportarRelatorioPdf(mes, ano)
+    } catch (e) {
+      alert(e.message || 'Não foi possível gerar o relatório.')
+    } finally {
+      setExportandoPdf(false)
+    }
   }
 
 
@@ -503,7 +521,7 @@ function App() {
         return (
           <div className="pagina">
 
-            <div className="pagina-cabecalho">
+            <div className="pagina-cabecalho pagina-cabecalho-acoes">
               <div>
                 <span className="pagina-kicker">
                   VISÃO GERAL
@@ -515,6 +533,16 @@ function App() {
                   Bem-vindo ao FinanDog. Seu dinheiro, organizado do seu jeito.
                 </p>
               </div>
+
+              <button
+                type="button"
+                className="botao-principal botao-acao-pagina"
+                onClick={handleExportarPdf}
+                disabled={exportandoPdf}
+              >
+                <span>📄</span>
+                {exportandoPdf ? 'Gerando PDF...' : 'Exportar relatório'}
+              </button>
             </div>
 
 
