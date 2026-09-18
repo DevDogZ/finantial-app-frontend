@@ -21,6 +21,7 @@ import {
   pagarParcelaDivida,
   getCartoes,
   criarCartao,
+  getComprasCartao,
   criarCompraCartao,
   deletarCategoria,
   deletarConta,
@@ -93,6 +94,10 @@ function App() {
   const [modalAtual, setModalAtual] = useState(null)
   const [exportandoPdf, setExportandoPdf] = useState(false)
 
+  const agora = new Date()
+  const [periodoMes, setPeriodoMes] = useState(String(agora.getMonth() + 1))
+  const [periodoAno, setPeriodoAno] = useState(String(agora.getFullYear()))
+
 
   // ============================================================
   // AUTENTICAÇÃO
@@ -126,9 +131,8 @@ function App() {
 
 
     async function handleExportarPdf() {
-    const agora = new Date()
-    const mes = agora.getMonth() + 1
-    const ano = agora.getFullYear()
+    const mes = Number(periodoMes)
+    const ano = Number(periodoAno)
 
     setExportandoPdf(true)
     try {
@@ -165,6 +169,7 @@ function App() {
           carregarContasFixas(),
           carregarDividas(),
           carregarCartoes(),
+          carregarComprasCartao(),
         ])
       } catch (e) {
         console.error('Erro ao inicializar aplicação:', e)
@@ -461,13 +466,17 @@ function App() {
   // COMPRAS NO CARTÃO
   // ============================================================
 
-  async function handleCriarCompraCartao(dados) {
-    const novaCompra = await criarCompraCartao(dados)
+  async function carregarComprasCartao() {
+    try {
+      setComprasCartao(await getComprasCartao())
+    } catch (e) {
+      console.error('Erro ao carregar compras do cartão:', e)
+    }
+  }
 
-    setComprasCartao((comprasAnteriores) => [
-      ...comprasAnteriores,
-      novaCompra,
-    ])
+  async function handleCriarCompraCartao(dados) {
+    await criarCompraCartao(dados)
+    await carregarComprasCartao()
   }
 
 
@@ -475,8 +484,19 @@ function App() {
   // DASHBOARD
   // ============================================================
 
+  function transacoesDoPeriodo() {
+    const mes = Number(periodoMes)
+    const ano = Number(periodoAno)
+
+    return transacoes.filter((transacao) => {
+      const partes = String(transacao.data || '').split('-')
+      if (partes.length !== 3) return false
+      return Number(partes[1]) === mes && Number(partes[0]) === ano
+    })
+  }
+
   function calcularReceitas() {
-    return transacoes
+    return transacoesDoPeriodo()
       .filter((transacao) => transacao.tipo === 'entrada')
       .reduce(
         (total, transacao) =>
@@ -485,9 +505,8 @@ function App() {
       )
   }
 
-
   function calcularDespesas() {
-    return transacoes
+    return transacoesDoPeriodo()
       .filter((transacao) => transacao.tipo === 'saida')
       .reduce(
         (total, transacao) =>
@@ -496,9 +515,21 @@ function App() {
       )
   }
 
+  function calcularResultado() {
+    return calcularReceitas() - calcularDespesas()
+  }
 
   function calcularSaldo() {
-    return calcularReceitas() - calcularDespesas()
+    return contas.reduce(
+      (total, conta) =>
+        total + Number(conta.saldo_inicial || 0),
+      0
+    ) + transacoes
+      .filter((transacao) => transacao.tipo === 'entrada')
+      .reduce((total, t) => total + Number(t.valor || 0), 0)
+      - transacoes
+      .filter((transacao) => transacao.tipo === 'saida')
+      .reduce((total, t) => total + Number(t.valor || 0), 0)
   }
 
 
@@ -507,6 +538,15 @@ function App() {
       style: 'currency',
       currency: 'BRL',
     })
+  }
+
+  function nomeDoMes(mes) {
+    const nomes = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    ]
+
+    return nomes[Number(mes) - 1] || ''
   }
 
 
@@ -545,57 +585,96 @@ function App() {
               </button>
             </div>
 
+            <div className="painel painel-periodo">
+              <div className="painel-cabecalho">
+                <div>
+                  <span className="painel-kicker">
+                    PERÍODO
+                  </span>
+
+                  <h2>
+                    {nomeDoMes(periodoMes)} / {periodoAno}
+                  </h2>
+                </div>
+              </div>
+
+              <div className="formulario-grid">
+                <div className="campo">
+                  <label htmlFor="dashboard-mes">Mês</label>
+                  <input
+                    id="dashboard-mes"
+                    type="number"
+                    min="1"
+                    max="12"
+                    value={periodoMes}
+                    onChange={(evento) => setPeriodoMes(evento.target.value)}
+                    placeholder="Mês"
+                  />
+                </div>
+
+                <div className="campo">
+                  <label htmlFor="dashboard-ano">Ano</label>
+                  <input
+                    id="dashboard-ano"
+                    type="number"
+                    value={periodoAno}
+                    onChange={(evento) => setPeriodoAno(evento.target.value)}
+                    placeholder="Ano"
+                  />
+                </div>
+              </div>
+            </div>
+
 
             <div className="dashboard-cards">
 
               <div className="dashboard-card dashboard-card-entrada">
-                <span>Entradas</span>
+                <span>Entradas do mês</span>
 
                 <strong>
                   {formatarMoeda(calcularReceitas())}
                 </strong>
 
                 <small>
-                  Total registrado
+                  {nomeDoMes(periodoMes)} / {periodoAno}
                 </small>
               </div>
 
-
               <div className="dashboard-card dashboard-card-saida">
-                <span>Saídas</span>
+                <span>Saídas do mês</span>
 
                 <strong>
                   {formatarMoeda(calcularDespesas())}
                 </strong>
 
                 <small>
-                  Total registrado
+                  {nomeDoMes(periodoMes)} / {periodoAno}
                 </small>
               </div>
 
+              <div className={`dashboard-card dashboard-card-resultado ${
+                calcularResultado() >= 0 ? 'resultado-positivo' : 'resultado-negativo'
+              }`}>
+                <span>Resultado do mês</span>
+
+                <strong>
+                  {formatarMoeda(calcularResultado())}
+                </strong>
+
+                <small>
+                  Entradas - saídas do período
+                </small>
+              </div>
 
               <div className="dashboard-card dashboard-card-saldo">
-                <span>Saldo</span>
+                <span>Saldo atual</span>
 
                 <strong>
                   {formatarMoeda(calcularSaldo())}
                 </strong>
 
                 <small>
-                  Entradas - saídas
-                </small>
-              </div>
-
-
-              <div className="dashboard-card dashboard-card-meta">
-                <span>Metas</span>
-
-                <strong>
-                  {metas.length}
-                </strong>
-
-                <small>
-                  Metas cadastradas
+                  Patrimônio acumulado
                 </small>
               </div>
 
@@ -722,8 +801,7 @@ function App() {
                 <div className="lista-dashboard">
 
                   {transacoes
-                    .slice(-5)
-                    .reverse()
+                    .slice(0, 5)
                     .map((transacao) => (
                       <div
                         className="item-dashboard item-transacao"
@@ -1236,6 +1314,8 @@ function App() {
 
               <VisualizadorFatura
                 cartoes={cartoes}
+                contas={contas}
+                aoPagarParcela={carregarTransacoes}
               />
             </div>
           </div>

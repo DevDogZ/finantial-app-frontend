@@ -784,6 +784,26 @@ body {
   color: var(--purple-light);
 }
 
+.dashboard-card-resultado {
+  color: var(--cyan);
+}
+
+.dashboard-card-resultado.resultado-positivo {
+  color: var(--green);
+}
+
+.dashboard-card-resultado.resultado-negativo {
+  color: var(--pink);
+}
+
+.painel-periodo {
+  margin-bottom: 20px;
+}
+
+.painel-periodo .formulario-grid {
+  margin-top: 15px;
+}
+
 
 .dashboard-grid {
   display: grid;

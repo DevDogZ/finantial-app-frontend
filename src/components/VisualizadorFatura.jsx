@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { getFatura, pagarParcelaCartao } from "../api";
 
-function VisualizadorFatura({ cartoes }){
+function VisualizadorFatura({ cartoes, contas = [], aoPagarParcela }){
     const [cartaoId, setCartaoId] = useState('')
     const [mes, setMes] = useState('')
     const [ano, setAno] = useState('')
+    const [contaId, setContaId] = useState('')
     const [fatura, setFatura] = useState(null)
 
     async function handleBuscar(){
@@ -14,13 +15,20 @@ function VisualizadorFatura({ cartoes }){
     }
 
     async function handleAlternarPagamento(parcelaId){
-        const parcelaAtualizada = await pagarParcelaCartao(parcelaId)
+        if(!contaId){
+            alert('Selecione a conta usada para pagar a parcela.')
+            return
+        }
+
+        const parcelaAtualizada = await pagarParcelaCartao(parcelaId, parseInt(contaId))
         setFatura((faturaAnterior) => ({
             ...faturaAnterior,
             parcelas: faturaAnterior.parcelas.map((parcela) =>
                 parcela.id === parcelaAtualizada.id ? parcelaAtualizada : parcela
             ),
         }))
+
+        if(aoPagarParcela) await aoPagarParcela()
     }
 
     return (
@@ -60,6 +68,18 @@ function VisualizadorFatura({ cartoes }){
                         onChange={(evento) => setAno(evento.target.value)}
                         placeholder="Ano"
                     />
+                </div>
+
+                <div className="campo campo-largo">
+                    <label htmlFor="fatura-conta">Conta de pagamento</label>
+                    <select
+                        id="fatura-conta"
+                        value={contaId}
+                        onChange={(evento) => setContaId(evento.target.value)}
+                    >
+                        <option value="">Selecione a conta</option>
+                        {contas.map((conta) => <option key={conta.id} value={conta.id}>{conta.nome}</option>)}
+                    </select>
                 </div>
             </div>
 

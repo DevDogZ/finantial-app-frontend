@@ -12,6 +12,7 @@ function ItemCompraCartao({ compra }) {
         <span className="registro-label">COMPRA</span>
         <strong className="registro-titulo">{compra.descricao}</strong>
         <span className="registro-subtitulo">
+          {compra.cartao?.nome ? `\ud83d\udcb3 ${compra.cartao.nome} · ` : ''}
           {compra.numero_parcelas}x de {moeda(compra.valor_total / compra.numero_parcelas)}
         </span>
 

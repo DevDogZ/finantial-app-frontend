@@ -296,6 +296,10 @@ export async function deletarCartao(cartaoId) {
 // COMPRAS NO CARTÃO
 // ============================================================
 
+export async function getComprasCartao() {
+  return request('/compras-cartao')
+}
+
 export async function criarCompraCartao(dados) {
   return request('/compras-cartao', {
     method: 'POST',
@@ -309,9 +313,10 @@ export async function getFatura(cartaoId, mes, ano) {
   )
 }
 
-export async function pagarParcelaCartao(parcelaId) {
+export async function pagarParcelaCartao(parcelaId, contaId) {
   return request(`/parcelas-cartao/${parcelaId}/pagar`, {
     method: 'POST',
+    body: JSON.stringify({ conta_id: contaId }),
   })
 }
 
