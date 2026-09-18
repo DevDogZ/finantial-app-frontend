@@ -1,3 +1,5 @@
+import ListaScroll from './ListaScroll'
+
 function ListaTransacoes({ transacoes, aoDeletar }) {
   function formatarData(data) {
     if (!data) return '--/--/----'
@@ -28,7 +30,7 @@ function ListaTransacoes({ transacoes, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {transacoes.map((transacao) => {
         const entrada = transacao.tipo === 'entrada'
 
@@ -70,7 +72,7 @@ function ListaTransacoes({ transacoes, aoDeletar }) {
           </li>
         )
       })}
-    </ul>
+    </ListaScroll>
   )
 }
 

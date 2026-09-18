@@ -95,10 +95,10 @@ export async function getCategorias() {
   return request('/categorias')
 }
 
-export async function criarCategoria(nome) {
+export async function criarCategoria(nome, cor) {
   return request('/categorias', {
     method: 'POST',
-    body: JSON.stringify({ nome }),
+    body: JSON.stringify({ nome, cor }),
   })
 }
 
@@ -307,6 +307,12 @@ export async function getFatura(cartaoId, mes, ano) {
   return request(
     `/cartoes/${cartaoId}/fatura?mes=${mes}&ano=${ano}`
   )
+}
+
+export async function pagarParcelaCartao(parcelaId) {
+  return request(`/parcelas-cartao/${parcelaId}/pagar`, {
+    method: 'POST',
+  })
 }
 
 // ============================================================

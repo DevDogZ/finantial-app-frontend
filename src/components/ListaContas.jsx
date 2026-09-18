@@ -1,4 +1,5 @@
 import ItemConta from './ItemConta'
+import ListaScroll from './ListaScroll'
 
 function ListaContas({ contas, aoDeletar }) {
   if (contas.length === 0) {
@@ -12,7 +13,7 @@ function ListaContas({ contas, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {contas.map((conta) => (
         <ItemConta
           key={conta.id}
@@ -20,7 +21,7 @@ function ListaContas({ contas, aoDeletar }) {
           aoDeletar={aoDeletar}
         />
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

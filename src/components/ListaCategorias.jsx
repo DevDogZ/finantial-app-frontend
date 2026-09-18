@@ -1,3 +1,5 @@
+import ListaScroll from './ListaScroll'
+
 function ListaCategorias({ categorias, aoDeletar }) {
   if (categorias.length === 0) {
     return (
@@ -10,10 +12,15 @@ function ListaCategorias({ categorias, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {categorias.map((categoria) => (
         <li key={categoria.id} className="registro-card registro-categoria">
-          <div className="registro-icone">◈</div>
+          <div
+            className="registro-icone"
+            style={categoria.cor ? { color: categoria.cor } : undefined}
+          >
+            ◈
+          </div>
 
           <div className="registro-conteudo">
             <span className="registro-label">CATEGORIA</span>
@@ -29,7 +36,7 @@ function ListaCategorias({ categorias, aoDeletar }) {
           </button>
         </li>
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

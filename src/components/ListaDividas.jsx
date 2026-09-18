@@ -1,5 +1,8 @@
 import ItemDivida from './ItemDivida'
+import ListaScroll from './ListaScroll'
 
+// Dívidas têm cards altos (barra de progresso), então limitamos
+// a 3 itens visíveis antes da rolagem interna.
 function ListaDividas({ dividas, aoPagarParcela, aoDeletar }) {
   if (dividas.length === 0) {
     return (
@@ -12,7 +15,7 @@ function ListaDividas({ dividas, aoPagarParcela, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll className="lista-registros lista-menor">
       {dividas.map((divida) => (
         <ItemDivida
           key={divida.id}
@@ -21,7 +24,7 @@ function ListaDividas({ dividas, aoPagarParcela, aoDeletar }) {
           aoDeletar={aoDeletar}
         />
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

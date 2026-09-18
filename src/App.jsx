@@ -192,8 +192,8 @@ function App() {
   }
 
 
-  async function handleCriarCategoria(nome) {
-    await criarCategoria(nome)
+  async function handleCriarCategoria(nome, cor) {
+    await criarCategoria(nome, cor)
     await carregarCategorias()
   }
 
@@ -664,7 +664,14 @@ function App() {
                 ) : (
                   <div className="tags-dashboard">
                     {categorias.slice(0, 8).map((categoria) => (
-                      <span key={categoria.id}>
+                      <span
+                        key={categoria.id}
+                        style={
+                          categoria.cor
+                            ? { color: categoria.cor, borderColor: categoria.cor }
+                            : undefined
+                        }
+                      >
                         {categoria.nome}
                       </span>
                     ))}

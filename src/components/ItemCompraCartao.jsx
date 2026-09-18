@@ -18,8 +18,12 @@ function ItemCompraCartao({ compra }) {
         {compra.parcelas?.length > 0 && (
           <div className="parcelas-lista">
             {compra.parcelas.map((parcela) => (
-              <span key={parcela.id} className="parcela-pill">
+              <span
+                key={parcela.id}
+                className={`parcela-pill ${parcela.paga ? 'parcela-paga' : ''}`}
+              >
                 {parcela.numero_parcela}ª · {moeda(parcela.valor_parcela)} · {parcela.mes_fatura}/{parcela.ano_fatura}
+                {parcela.paga ? ' · paga' : ''}
               </span>
             ))}
           </div>

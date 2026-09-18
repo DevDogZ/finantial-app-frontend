@@ -1,5 +1,8 @@
 import ItemMeta from './ItemMeta'
+import ListaScroll from './ListaScroll'
 
+// Metas têm cards altos (barra de progresso + contribuição), então
+// limitamos a 3 itens visíveis antes da rolagem interna.
 function ListaMetas({ metas, aoContribuir, aoDeletar }) {
   if (metas.length === 0) {
     return (
@@ -12,7 +15,7 @@ function ListaMetas({ metas, aoContribuir, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll className="lista-registros lista-menor">
       {metas.map((meta) => (
         <ItemMeta
           key={meta.id}
@@ -21,7 +24,7 @@ function ListaMetas({ metas, aoContribuir, aoDeletar }) {
           aoDeletar={aoDeletar}
         />
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

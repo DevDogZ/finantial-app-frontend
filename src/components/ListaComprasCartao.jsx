@@ -1,4 +1,5 @@
 import ItemCompraCartao from './ItemCompraCartao'
+import ListaScroll from './ListaScroll'
 
 function ListaComprasCartao({ compras }) {
   if (compras.length === 0) {
@@ -12,11 +13,11 @@ function ListaComprasCartao({ compras }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {compras.map((compra) => (
         <ItemCompraCartao key={compra.id} compra={compra} />
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

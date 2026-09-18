@@ -1,4 +1,5 @@
 import ItemContaFixa from './ItemContaFixa'
+import ListaScroll from './ListaScroll'
 
 function ListaContasFixas({ contasFixas, aoPagar, aoDesativar }) {
   if (contasFixas.length === 0) {
@@ -12,7 +13,7 @@ function ListaContasFixas({ contasFixas, aoPagar, aoDesativar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {contasFixas.map((contaFixa) => (
         <ItemContaFixa
           key={contaFixa.id}
@@ -21,7 +22,7 @@ function ListaContasFixas({ contasFixas, aoPagar, aoDesativar }) {
           aoDesativar={aoDesativar}
         />
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

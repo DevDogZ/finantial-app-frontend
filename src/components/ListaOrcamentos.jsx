@@ -1,3 +1,5 @@
+import ListaScroll from './ListaScroll'
+
 function ListaOrcamentos({ orcamentos, aoDeletar }) {
   function moeda(valor) {
     return Number(valor || 0).toLocaleString('pt-BR', {
@@ -17,7 +19,7 @@ function ListaOrcamentos({ orcamentos, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {orcamentos.map((orcamento) => (
         <li key={orcamento.id} className="registro-card">
           <div className="registro-icone">◎</div>
@@ -44,7 +46,7 @@ function ListaOrcamentos({ orcamentos, aoDeletar }) {
           </button>
         </li>
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

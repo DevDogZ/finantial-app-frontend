@@ -1,3 +1,5 @@
+import ListaScroll from './ListaScroll'
+
 function ListaCartoes({ cartoes, aoDeletar }) {
   const moeda = (valor) => Number(valor || 0).toLocaleString('pt-BR', {
     style: 'currency',
@@ -15,7 +17,7 @@ function ListaCartoes({ cartoes, aoDeletar }) {
   }
 
   return (
-    <ul className="lista-registros">
+    <ListaScroll>
       {cartoes.map((cartao) => (
         <li key={cartao.id} className="registro-card registro-cartao">
           <div className="cartao-visual">
@@ -45,7 +47,7 @@ function ListaCartoes({ cartoes, aoDeletar }) {
           </button>
         </li>
       ))}
-    </ul>
+    </ListaScroll>
   )
 }
 

@@ -800,6 +800,35 @@ body {
 .lista-dashboard {
   display: flex;
   flex-direction: column;
+
+  /*
+    O dashboard já limita a 5 itens no App.jsx (slice(0, 5)).
+    O max-height fica por conta do componente ListaScroll quando
+    a lista cresce; aqui só garantimos rolagem interna por segurança.
+  */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-right: 6px;
+  margin-right: -6px;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157, 78, 221, 0.35) transparent;
+
+  overscroll-behavior: contain;
+}
+
+.lista-dashboard::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-dashboard::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.35);
+  border-radius: 10px;
+}
+
+.lista-dashboard::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 
@@ -1788,6 +1817,26 @@ li button:hover {
   padding-left: 42px;
 }
 
+.campo-cor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campo-cor input[type='color'] {
+  width: 48px;
+  min-height: 48px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.campo-cor-valor {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: 'Chakra Petch', monospace;
+  text-transform: uppercase;
+}
+
 input,
 select,
 textarea {
@@ -2197,22 +2246,55 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 /* Registros / cards */
 
 .lista-registros {
+  /*
+    Limite de itens visíveis antes de aparecer a rolagem interna.
+    --itens-visiveis: quantos itens mostrar.
+    --item-lista:    altura de um card típico (varia por tipo).
+    --gap-lista:     espaçamento entre os cards (bate com o gap abaixo).
+  */
+  --itens-visiveis: 5;
+  --item-lista: 64px;
+  --gap-lista: 10px;
+
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--gap-lista);
   margin: 0;
   padding: 0;
   list-style: none;
 
-  max-height: 560px;
+  max-height: calc(
+    var(--itens-visiveis) * var(--item-lista) +
+      (var(--itens-visiveis) - 1) * var(--gap-lista)
+  );
   overflow-y: auto;
   overflow-x: hidden;
+
+  /*
+    Impede que os cards encolham (flex-shrink) para caber no
+    max-height — sem isto, os itens se espremem/sobrepõem em vez
+    de rolar.
+  */
+  flex-shrink: 0;
+  align-content: start;
 
   padding-right: 6px;
   margin-right: -6px;
 
   scrollbar-width: thin;
   scrollbar-color: rgba(157, 78, 221, 0.35) transparent;
+
+  /* Mantém o encaixe visual dentro do painel */
+  overscroll-behavior: contain;
+}
+
+/*
+  Metas e dívidas usam cards bem mais altos (barra de progresso +
+  formulário de contribuir), então mostram só 3 itens antes de rolar.
+*/
+.lista-menor {
+  --itens-visiveis: 3;
+  --item-lista: 140px;
 }
 
 .lista-registros::-webkit-scrollbar {
@@ -2226,6 +2308,15 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 
 .lista-registros::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.lista-registros > li,
+.lista-fatura > .item-fatura {
+  /*
+    Os cards não devem encolher para caber no max-height da lista;
+    devem manter a altura e provocar a rolagem interna.
+  */
+  flex-shrink: 0;
 }
 
 .registro-card {
@@ -2518,6 +2609,61 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   background: rgba(157, 78, 221, .05);
   color: var(--text-muted);
   font-size: 8px;
+}
+
+.parcela-paga {
+  border-color: rgba(57, 255, 157, .35);
+  background: rgba(57, 255, 157, .08);
+  color: var(--green);
+}
+
+.lista-fatura {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  /*
+    Limita a ~5 parcelas antes de rolar.
+    Cada .item-fatura tem ~44px + gap de 8px.
+    5 itens = 5 x 44 + 4 x 8 = 252px.
+  */
+  max-height: 252px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  margin-right: -6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157, 78, 221, 0.35) transparent;
+  overscroll-behavior: contain;
+}
+
+.lista-fatura::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-fatura::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.35);
+  border-radius: 10px;
+}
+
+.lista-fatura::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.item-fatura {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(199, 125, 255, .12);
+  border-radius: 10px;
+  background: rgba(157, 78, 221, .04);
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 
 /* Estado vazio */

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getFatura } from "../api";
+import { getFatura, pagarParcelaCartao } from "../api";
 
 function VisualizadorFatura({ cartoes }){
     const [cartaoId, setCartaoId] = useState('')
@@ -8,9 +8,19 @@ function VisualizadorFatura({ cartoes }){
     const [fatura, setFatura] = useState(null)
 
     async function handleBuscar(){
-        if(!cartaoId || !mes || !ano ) return 
+        if(!cartaoId || !mes || !ano ) return
         const dados = await getFatura(cartaoId, mes, ano)
         setFatura(dados)
+    }
+
+    async function handleAlternarPagamento(parcelaId){
+        const parcelaAtualizada = await pagarParcelaCartao(parcelaId)
+        setFatura((faturaAnterior) => ({
+            ...faturaAnterior,
+            parcelas: faturaAnterior.parcelas.map((parcela) =>
+                parcela.id === parcelaAtualizada.id ? parcelaAtualizada : parcela
+            ),
+        }))
     }
 
     return (
@@ -58,10 +68,21 @@ function VisualizadorFatura({ cartoes }){
             {fatura && (
                 <div className="painel painel-fatura-resultado">
                     <h3>Fatura {fatura.mes}/{fatura.ano} - Total: R$ {fatura.total}</h3>
-                    <ul>
+                    <ul className="lista-fatura">
                         {fatura.parcelas.map((parcela) => (
-                            <li key={parcela.id}>Parcela - 
-                                                {parcela.numero_parcela}: R$ {parcela.valor_parcela}</li>
+                            <li key={parcela.id} className="item-fatura">
+                                <span>Parcela {parcela.numero_parcela}: R$ {parcela.valor_parcela}</span>
+                                <span className={`badge-tipo ${parcela.paga ? 'badge-quitada' : 'badge-saida'}`}>
+                                    {parcela.paga ? 'Paga' : 'Pendente'}
+                                </span>
+                                <button
+                                    type="button"
+                                    className={parcela.paga ? 'botao-secundario' : 'botao-sucesso'}
+                                    onClick={() => handleAlternarPagamento(parcela.id)}
+                                >
+                                    {parcela.paga ? 'Desmarcar' : 'Marcar como paga'}
+                                </button>
+                            </li>
                         ))}
                     </ul>
                 </div>
